@@ -244,9 +244,7 @@ button { cursor: pointer; }
     <div class="tgroup">
       <span class="label">시간</span>
       <div class="hours">
-        <select id="startSel" aria-label="시작 시각"></select>
-        <span aria-hidden="true">–</span>
-        <select id="endSel" aria-label="끝 시각"></select>
+        <select id="startSel" aria-label="시각"></select>
         <button type="button" class="now" id="nowBtn" aria-pressed="false">지금</button>
       </div>
     </div>
@@ -308,7 +306,7 @@ button { cursor: pointer; }
   const S = {
     campus: store.get('gc.campus') === 'M' ? 'M' : 'G',
     mapBld: '',
-    day: 0, ws: 9, we: 10, nowMode: false, room: null, sem: null
+    day: 0, ws: 9, we: 9 + 1 / 60, nowMode: false, room: null, sem: null
   };
   let ROOMS = new Map(), GEOS = {}, LAST_RES = null;
 
@@ -396,10 +394,10 @@ button { cursor: pointer; }
   function renderControls() {
     for (const b of $('campusSeg').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.c === S.campus));
     $('daySeg').innerHTML = DAYS.map((d, i) => `<button type="button" data-d="${i}" aria-pressed="${i === S.day}" aria-label="${DAY_FULL[i]}">${d}</button>`).join('');
-    const opts = (from, to, sel) => { let h = ''; for (let x = from; x <= to; x++) h += `<option value="${x}"${x === sel ? ' selected' : ''}>${String(x).padStart(2, '0')}:00</option>`; return h; };
-    const ws = Math.floor(S.ws), we = Math.max(ws + 1, Math.ceil(S.we));
-    $('startSel').innerHTML = opts(FIRST, LAST - 1, ws);
-    $('endSel').innerHTML = opts(FIRST + 1, LAST, we);
+    const slot = Math.floor(S.ws * 2) / 2;
+    let opts = S.nowMode ? `<option value="now" selected>${hhmm(S.ws)} (지금)</option>` : '';
+    for (let x = FIRST; x < LAST; x += 0.5) opts += `<option value="${x}"${!S.nowMode && x === slot ? ' selected' : ''}>${hhmm(x)}</option>`;
+    $('startSel').innerHTML = opts;
     $('nowBtn').setAttribute('aria-pressed', String(S.nowMode));
     $('roomList').innerHTML = campusRooms().sort((a, b) => ko(a.label, b.label)).map((r) => `<option value="${esc(r.label)}"></option>`).join('');
   }
@@ -410,7 +408,7 @@ button { cursor: pointer; }
     if (S.mapBld && !mapGroupExists(R, S.mapBld)) S.mapBld = '';
     if (S.room && !ROOMS.has(S.room)) S.room = null;
 
-    const when = S.nowMode ? `지금 · ${DAY_FULL[S.day]} ${hhmm(S.ws)}` : `${DAY_FULL[S.day]} ${hhmm(S.ws)}–${hhmm(S.we)}`;
+    const when = `${S.nowMode ? '지금 · ' : ''}${DAY_FULL[S.day]} ${hhmm(S.ws)}`;
     $('summary').innerHTML = `<span class="when">${when}</span><span class="counts">빈 강의실 <b class="f">${freeAll}</b>곳 · 확인 필요 <b class="m">${maybeAll}</b>곳 · 수업 중 <b>${R.res.length - freeAll - maybeAll}</b>곳</span>`;
     renderMap(R);
   }
@@ -585,7 +583,7 @@ button { cursor: pointer; }
       }
       let html = '';
       if (d === S.day) {
-        const a = Math.max(H0, S.ws), z = Math.min(H1, S.nowMode ? S.ws + 0.25 : S.we);
+        const a = Math.max(H0, S.ws), z = Math.min(H1, S.ws + 0.25);
         if (z > a) html += `<div class="tt-band" style="top:${px(a)};height:calc(${z - a} * ${rh})"></div>`;
       }
       for (const c of clusters) for (const b of c) {
@@ -602,7 +600,7 @@ button { cursor: pointer; }
       <button type="button" class="ghost crumb" id="roomBack">← ${esc(bldName)} 빈 강의실</button>
       <div class="detail-h">
         <div class="t"><span class="b">${esc(room.bld)}</span><span class="r">${esc(room.no || room.bld)}</span><span class="s">이번 학기 수업 ${seen.size}개</span></div>
-        <span class="state ${st.st}">${DAY_FULL[S.day]} ${S.nowMode ? '지금' : hhmm(S.ws) + '–' + hhmm(S.we)} ${stTxt}</span>
+        <span class="state ${st.st}">${DAY_FULL[S.day]} ${S.nowMode ? '지금' : hhmm(S.ws)} ${stTxt}</span>
       </div>
       <div class="legend"><span><i></i>정규 수업</span><span><i class="p"></i>일부 기간 수업</span><span><i class="x"></i>강의실 여러 곳</span><span><i class="w"></i>고른 시간</span></div>
       <div class="tt-scroll"><div class="tt" style="--cols:${daysShown.length};--rows:${rows}">
@@ -625,7 +623,7 @@ button { cursor: pointer; }
     const n = seoulNow();
     S.day = n.day;
     if (n.t >= FIRST && n.t < LAST) { S.nowMode = true; S.ws = n.t; S.we = n.t + 1 / 60; }
-    else { S.nowMode = false; if (n.t >= LAST) S.day = (n.day + 1) % 7; S.ws = FIRST; S.we = FIRST + 1; }
+    else { S.nowMode = false; if (n.t >= LAST) S.day = (n.day + 1) % 7; S.ws = FIRST; S.we = FIRST + 1 / 60; }
   }
 
   const norm = (s) => s.replace(/\(M\)/g, '').replace(/[\s\-]/g, '').toLowerCase();
@@ -641,9 +639,8 @@ button { cursor: pointer; }
     applyTheme(store.get('gc.theme'));
     $('themeSeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; store.set('gc.theme', b.dataset.t); applyTheme(b.dataset.t); };
     $('campusSeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.campus = b.dataset.c; S.mapBld = ''; S.room = null; store.set('gc.campus', S.campus); renderControls(); render(); };
-    $('daySeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.day = +b.dataset.d; if (S.nowMode) { S.nowMode = false; S.ws = Math.floor(S.ws); S.we = S.ws + 1; } renderControls(); render(); };
-    $('startSel').onchange = () => { S.nowMode = false; S.ws = +$('startSel').value; if (S.we <= S.ws) S.we = S.ws + 1; S.we = Math.ceil(S.we); renderControls(); render(); };
-    $('endSel').onchange = () => { S.nowMode = false; S.we = +$('endSel').value; S.ws = Math.floor(S.ws); if (S.ws >= S.we) S.ws = S.we - 1; renderControls(); render(); };
+    $('daySeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.day = +b.dataset.d; if (S.nowMode) { S.nowMode = false; S.ws = Math.floor(S.ws * 2) / 2; S.we = S.ws + 1 / 60; } renderControls(); render(); };
+    $('startSel').onchange = () => { const v = $('startSel').value; if (v === 'now') return; S.nowMode = false; S.ws = +v; S.we = S.ws + 1 / 60; renderControls(); render(); };
     $('nowBtn').onclick = () => { setNow(); renderControls(); render(); };
     const roomClick = (e) => { const b = e.target.closest('[data-room]'); if (b) { openRoom(b.dataset.room); return true; } return false; };
     $('mapPanel').onclick = (e) => { if (roomClick(e)) return; const b = e.target.closest('[data-mb]'); if (b) selectMapBld(b.dataset.mb); };
