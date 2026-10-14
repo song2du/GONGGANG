@@ -1,48 +1,58 @@
-# 어디가지? (GONGGANG)
+# Where to go? (어디가지?)
 
-**공강 시간에 갈 곳 없는 사람들을 위한 웹사이트**
+**A website for people with nowhere to go between classes.**
 
-가천대학교 공식 시간표로 요일·시간을 고르고, 캠퍼스 지도에서 건물을 눌러 빈 강의실과 강의실별 주간 시간표를 보는 페이지예요.
+Pick a day and a time, then tap a building on the campus map to see which Gachon University classrooms are free at that moment and how long they stay free. Everything comes from the university's official timetable.
 
-- 페이지: https://song2du.github.io/GONGGANG/
-- 한국어, English, 日本語, 中文, Tiếng Việt, Монгол을 지원해요. 처음 열 때 브라우저 언어로 자동 선택돼요.
-- 학교와 관계없는 학생용 비공식 페이지예요.
+- **Live site:** https://song2du.github.io/where-to-go/
+- **Languages:** 한국어, English, 日本語, 中文, Tiếng Việt, Монгол (chosen automatically from your browser language)
+- Unofficial student project. Not affiliated with Gachon University.
 
-## 시간표 데이터가 들어오는 방식
+## How it works
 
-1. **페이지를 열 때 실시간으로 받아요.** 학생 브라우저가 [가천대학교 시간표 및 강의계획서 조회](https://info.gachon.ac.kr/ssu/showTimetable.do)의 조회 API에 직접 요청해서 지금 학기 시간표를 받아요. 받은 데이터는 그 브라우저에 6시간 동안 보관해요.
-2. **매일 저장본을 갱신해요.** `.github/workflows/update-timetable.yml`이 매일 06:17(한국 시간)에 `scripts/fetch-timetable.mjs`를 실행해 지금 학기 시간표를 `data/`에 저장해요. 새 학기 데이터가 저장되면 지난 학기 데이터는 지워요. 데이터가 바뀌었을 때만 커밋해요. 학교 서버에 연결되지 않을 때 페이지가 이 저장본을 보여줘요.
-3. **학기는 날짜로 정해요.** 3~8월은 1학기, 9~2월은 2학기이고, 페이지는 항상 지금 학기만 보여줘요.
+### Timetable data
 
-특정 학기를 직접 받으려면 Actions 탭에서 "시간표 갱신"을 수동 실행하고 학기를 적어요(예: `2027-10`). 학기 코드는 10 = 1학기, 11 = 여름계절, 20 = 2학기, 21 = 겨울계절이에요.
+1. **Live on every visit.** The browser requests the current semester's timetable directly from Gachon University's [timetable and syllabus lookup](https://info.gachon.ac.kr/ssu/showTimetable.do) and keeps it in the browser for 6 hours.
+2. **Daily saved copy.** [`update-timetable.yml`](.github/workflows/update-timetable.yml) runs [`scripts/fetch-timetable.mjs`](scripts/fetch-timetable.mjs) every day at 06:17 KST and saves the current semester to `data/`. It commits only when the timetable changed. When a new semester is saved, the previous semester's file is deleted. The site falls back to this copy when the school server can't be reached.
+3. **Semester by date.** March–August is the spring semester (1학기) and September–February the fall semester (2학기). The site always shows the current one.
 
-## 파일
+To fetch a specific semester by hand, run the **시간표 갱신** workflow from the Actions tab and enter a term such as `2027-10`. Term codes: `10` spring, `11` summer session, `20` fall, `21` winter session.
 
-| 경로 | 내용 |
+### Free rooms
+
+- Period 1 starts at 09:00 and each period counts as one hour.
+- A room is **free** when no regular class is scheduled at the chosen time. The site also shows when its next class starts.
+- A room is marked **check** when the only class there is a part-term class (12 weeks, 4 weeks, …) or a class listed with several rooms, so it may or may not be in use.
+- Only regular classes are known. Make-up classes, exams, events and room bookings are not.
+- Rooms with no classes at all this semester don't appear.
+
+### Maps
+
+Campus maps are drawn from [OpenStreetMap](https://www.openstreetmap.org/copyright) building and path data, converted to meters. Medical Campus building names were checked against KakaoMap and Naver Map. 바이오나노대학 has no confirmed location, so it appears only in the building list. When the site is not in Korean, building names are shown in Korean (as on campus signs) with a translation underneath.
+
+## Files
+
+| Path | Contents |
 |---|---|
-| `index.html` | 페이지 전체 (외부 라이브러리 없음) |
-| `data/index.json` | 저장된 학기 목록 |
-| `data/YYYY-TT.json` | 학기별 시간표 원본 (학수번호, 과목명, 교수, 이수구분, 강의시간, 강의실, 사이버 여부) |
-| `data/map-global.json`, `data/map-medical.json` | 캠퍼스 지도 (OpenStreetMap 건물·길 데이터, 미터 단위로 변환) |
-| `scripts/fetch-timetable.mjs` | 학교 시간표를 받아 `data/`에 저장하는 스크립트 (Node 20+) |
+| `index.html` | The whole site, no external libraries |
+| `data/index.json` | List of saved semesters |
+| `data/YYYY-TT.json` | Timetable for one semester: course code, title, instructor, category, time, room, online flag |
+| `data/map-global.json`, `data/map-medical.json` | Campus maps |
+| `data/status.json` | Last check date (keeps the scheduled workflow active) |
+| `scripts/fetch-timetable.mjs` | Fetches the timetable into `data/` (Node 20+) |
+| `.github/workflows/update-timetable.yml` | Daily update job |
 
-## 계산 기준
-
-- 교시는 1교시 09:00부터 교시당 1시간으로 계산해요.
-- 12주·4주처럼 학기 일부만 하는 수업, 강의실이 여러 곳으로 적힌 수업이 걸린 강의실은 "확인 필요"로 따로 보여줘요.
-- 시간표에 있는 정규 수업만 반영해요. 보강, 시험, 행사, 예약은 알 수 없어요.
-
-## 직접 실행
+## Run locally
 
 ```sh
-node scripts/fetch-timetable.mjs          # 지금 학기
-node scripts/fetch-timetable.mjs 2027-10  # 특정 학기
-python3 -m http.server                    # http://localhost:8000 에서 확인
+node scripts/fetch-timetable.mjs          # current semester
+node scripts/fetch-timetable.mjs 2027-10  # a specific semester
+python3 -m http.server                    # then open http://localhost:8000
 ```
 
-## 만든 사람
+## Credits
 
-- [Yidu Song (@song2du)](https://github.com/song2du) — 기획, 디자인 방향
-- Claude (Anthropic) — 구현 도움
+- [Yidu Song (@song2du)](https://github.com/song2du): idea, product direction, design decisions
+- Claude (Anthropic): implementation help
 
-지도 데이터 © [OpenStreetMap](https://www.openstreetmap.org/copyright) 기여자 (ODbL)
+Map data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (ODbL). Timetable data from Gachon University.
