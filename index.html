@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>가천 빈 강의실</title>
+<meta name="description" content="가천대학교 공식 시간표로 요일·시간을 고르고 캠퍼스 지도에서 빈 강의실과 강의실별 시간표를 찾는 페이지">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='3' width='24' height='26' rx='3' fill='%231D4E9E'/%3E%3Crect x='9' y='8' width='14' height='5' rx='1' fill='%23fff'/%3E%3Ccircle cx='21' cy='19' r='2' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: header, a condition bar (day, hours, room search), then the drawn campus map beside one panel that steps building list -> building's free rooms -> room timetable. */
+:root {
+  --paper: #F3F5F8; --card: #FFFFFF; --ink: #121A2B; --ink-2: #4B566B; --ink-3: #737E91; --rule: #DCE1E9;
+  --accent: #1D4E9E; --accent-soft: #E4ECF8; --accent-line: #9FB7E0; --on-accent: #FFFFFF;
+  --free: #17663F; --free-bg: #E3F2E9; --free-line: #A8D5BA;
+  --maybe: #835300; --maybe-bg: #FBF0D8; --maybe-line: #E6C57C;
+  --band: #1D4E9E1F; --danger: #A12C2C;
+  --campus: #E7ECF3; --road: #CBD3DF; --road-major: #B3BECE; --path: #C3CCD9;
+  --b-idle: #D6DCE5; --b-busy: #AEB8C7; --g1: #C4E5D0; --g2: #7FC89C; --g3: #2E9A5D; --field: #DCE3D8;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --rh: 40px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0D121B; --card: #151C29; --ink: #E7ECF4; --ink-2: #A7B1C3; --ink-3: #7B8699; --rule: #263044;
+  --accent: #8AADEE; --accent-soft: #1B2842; --accent-line: #35508A; --on-accent: #0D121B;
+  --free: #7DD4A2; --free-bg: #11281C; --free-line: #2A5A3F;
+  --maybe: #EBC06A; --maybe-bg: #2D2410; --maybe-line: #5E4A1E;
+  --band: #8AADEE26; --danger: #F09B9B;
+  --campus: #151D2B; --road: #2A3549; --road-major: #364359; --path: #2C374B;
+  --b-idle: #252F41; --b-busy: #3A4659; --g1: #1E4631; --g2: #2B7A4F; --g3: #4DB47E; --field: #1C2620;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #0D121B; --card: #151C29; --ink: #E7ECF4; --ink-2: #A7B1C3; --ink-3: #7B8699; --rule: #263044;
+  --accent: #8AADEE; --accent-soft: #1B2842; --accent-line: #35508A; --on-accent: #0D121B;
+  --free: #7DD4A2; --free-bg: #11281C; --free-line: #2A5A3F;
+  --maybe: #EBC06A; --maybe-bg: #2D2410; --maybe-line: #5E4A1E;
+  --band: #8AADEE26; --danger: #F09B9B;
+  --campus: #151D2B; --road: #2A3549; --road-major: #364359; --path: #2C374B;
+  --b-idle: #252F41; --b-busy: #3A4659; --g1: #1E4631; --g2: #2B7A4F; --g3: #4DB47E; --field: #1C2620;
+  color-scheme: dark; }
+html:root[data-mode="light"] {
+  --paper: #F3F5F8; --card: #FFFFFF; --ink: #121A2B; --ink-2: #4B566B; --ink-3: #737E91; --rule: #DCE1E9;
+  --accent: #1D4E9E; --accent-soft: #E4ECF8; --accent-line: #9FB7E0; --on-accent: #FFFFFF;
+  --free: #17663F; --free-bg: #E3F2E9; --free-line: #A8D5BA;
+  --maybe: #835300; --maybe-bg: #FBF0D8; --maybe-line: #E6C57C;
+  --band: #1D4E9E1F; --danger: #A12C2C;
+  --campus: #E7ECF3; --road: #CBD3DF; --road-major: #B3BECE; --path: #C3CCD9;
+  --b-idle: #D6DCE5; --b-busy: #AEB8C7; --g1: #C4E5D0; --g2: #7FC89C; --g3: #2E9A5D; --field: #DCE3D8;
+  color-scheme: light; }
+html:root[data-mode="dark"] {
+  --paper: #0D121B; --card: #151C29; --ink: #E7ECF4; --ink-2: #A7B1C3; --ink-3: #7B8699; --rule: #263044;
+  --accent: #8AADEE; --accent-soft: #1B2842; --accent-line: #35508A; --on-accent: #0D121B;
+  --free: #7DD4A2; --free-bg: #11281C; --free-line: #2A5A3F;
+  --maybe: #EBC06A; --maybe-bg: #2D2410; --maybe-line: #5E4A1E;
+  --band: #8AADEE26; --danger: #F09B9B;
+  --campus: #151D2B; --road: #2A3549; --road-major: #364359; --path: #2C374B;
+  --b-idle: #252F41; --b-busy: #3A4659; --g1: #1E4631; --g2: #2B7A4F; --g3: #4DB47E; --field: #1C2620;
+  color-scheme: dark; }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
+.src-live { color: var(--free); }
+.wrap { max-width: 1160px; margin: 0 auto; padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 18px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); }
+.brand h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+.brand p { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); padding: 3px; gap: 2px; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 6px; color: var(--ink-2); font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.seg button:not([aria-pressed="true"]):hover { background: var(--accent-soft); color: var(--ink); }
+.hdr-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.seg.icon button { display: inline-flex; align-items: center; justify-content: center; padding: 6px 8px; }
+.seg.icon svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 22px; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; }
+.tgroup { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tgroup.grow { flex: 1 1 220px; }
+.label { font-size: 12px; font-weight: 600; color: var(--ink-3); letter-spacing: 0.04em; }
+.days button { padding: 6px 10px; }
+.hours { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.hours select { padding: 7px 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); font-family: var(--mono); }
+.now { border: 1px solid var(--accent-line); background: var(--card); color: var(--accent); border-radius: 8px; padding: 7px 12px; font-weight: 600; }
+.now[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.search { display: flex; gap: 6px; }
+.search input { flex: 1; min-width: 0; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); }
+.search button { border: 1px solid var(--rule); background: var(--card); border-radius: 8px; padding: 0 12px; }
+.err { color: var(--danger); font-size: 13px; margin: 0; }
+@media (max-width: 560px) { .toolbar { padding: 12px; } .tgroup.days-g { width: 100%; } .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); width: 100%; box-sizing: border-box; } .days button { padding: 6px 0; } }
+
+.summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin: 0; }
+.summary .when { font-size: 20px; font-weight: 600; }
+.summary .counts { color: var(--ink-2); font-size: 14px; }
+.summary .counts b { font-family: var(--mono); font-weight: 600; }
+.summary .counts .f { color: var(--free); } .summary .counts .m { color: var(--maybe); }
+
+.board { display: flex; flex-direction: column; gap: 22px; }
+.plates { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.plate { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--free-line); background: var(--free-bg); color: var(--ink); text-align: left; min-width: 0; }
+.plate .no { font-family: var(--mono); font-size: 17px; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
+.plate .sub { font-size: 12px; color: var(--free); }
+.plate.maybe { border-color: var(--maybe-line); border-style: dashed; background: var(--maybe-bg); }
+.plate.maybe .sub { color: var(--maybe); }
+.plate:hover { border-color: var(--accent); }
+.plate[aria-current="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
+.empty { padding: 24px; border: 1px dashed var(--rule); border-radius: 10px; color: var(--ink-2); text-align: center; }
+
+.mapwrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (min-width: 920px) { .mapwrap { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: stretch; } .mappanel { contain: size; overflow-y: auto; overscroll-behavior: contain; } }
+.map { margin: 0; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+.map svg { display: block; width: 100%; height: auto; touch-action: manipulation; }
+.map figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; padding: 10px 14px; border-top: 1px solid var(--rule); font-size: 12px; color: var(--ink-3); }
+.map figcaption a { color: var(--ink-3); }
+.mlegend { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.mlegend i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.m-campus { fill: var(--campus); }
+.m-field { fill: var(--field); stroke: var(--card); stroke-width: 1.5; }
+.offsite { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--rule); }
+.offsite button { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; gap: 10px; flex: 1 1 260px; border: 1px dashed var(--rule); background: var(--paper); border-radius: 8px; padding: 8px 12px; text-align: left; }
+.offsite button:hover, .offsite button[aria-pressed="true"] { border-color: var(--accent); border-style: solid; }
+.offsite .nm { font-weight: 600; }
+.offsite .wh { font-size: 12px; color: var(--ink-3); min-width: 0; }
+.offsite .ct { font-family: var(--mono); font-weight: 600; color: var(--free); }
+.m-major { fill: none; stroke: var(--road-major); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.m-road { fill: none; stroke: var(--road); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.m-path { fill: none; stroke: var(--path); stroke-width: 1.6; stroke-dasharray: 4 4; stroke-linecap: round; }
+.m-b { stroke: var(--card); stroke-width: 1.5; transition: fill .15s; }
+.m-b.idle { fill: var(--b-idle); }
+.m-b.l0 { fill: var(--b-busy); } .m-b.l1 { fill: var(--g1); } .m-b.l2 { fill: var(--g2); } .m-b.l3 { fill: var(--g3); }
+.m-hit { cursor: pointer; }
+.m-hit:hover .m-b { stroke: var(--accent); stroke-width: 3; }
+.m-b.sel { stroke: var(--accent); stroke-width: 4; }
+.m-bub circle { fill: var(--card); stroke: var(--free); }
+.m-bub.zero circle { stroke: var(--ink-3); }
+.m-bub.sel circle { fill: var(--accent); stroke: var(--accent); }
+.m-bub text { fill: var(--free); font-family: var(--mono); font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+.m-bub.zero text { fill: var(--ink-3); }
+.m-bub.sel text { fill: var(--on-accent); }
+.m-lbl { fill: var(--ink); font-weight: 600; paint-order: stroke; stroke: var(--campus); stroke-linejoin: round; pointer-events: none; }
+.m-lbl.idle { fill: var(--ink-3); font-weight: 500; }
+.m-st rect { fill: var(--ink); } .m-st text { fill: var(--ink-2); font-weight: 600; }
+.m-scale line { stroke: var(--ink-2); } .m-scale text { fill: var(--ink-2); font-family: var(--mono); }
+.mappanel { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; scroll-margin-top: 16px; }
+.mp-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.mp-h h2 { font-size: 20px; font-weight: 600; }
+.mp-h p { margin: 2px 0 0; font-size: 13px; color: var(--ink-2); }
+.mp-hint { margin: 0; font-size: 14px; color: var(--ink-2); }
+.links { display: flex; flex-wrap: wrap; gap: 6px; }
+.links a { font-size: 13px; color: var(--accent); text-decoration: none; border: 1px solid var(--accent-line); border-radius: 6px; padding: 3px 9px; }
+.links a:hover { background: var(--accent-soft); }
+.rank { display: flex; flex-direction: column; border-top: 1px solid var(--rule); }
+.rank button { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: baseline; gap: 10px; border: 0; border-bottom: 1px solid var(--rule); background: transparent; padding: 9px 2px; text-align: left; }
+.rank button:hover { background: var(--accent-soft); }
+.rank .nm { font-weight: 500; min-width: 0; }
+.rank .nm small { margin-left: 6px; font-size: 11px; color: var(--ink-3); font-weight: 400; }
+.rank .f { font-family: var(--mono); color: var(--free); font-weight: 600; }
+.rank .m { font-family: var(--mono); color: var(--maybe); font-size: 12px; min-width: 3.5em; text-align: right; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.card { display: flex; flex-direction: column; gap: 4px; text-align: left; border: 1px solid var(--rule); background: var(--card); border-radius: 10px; padding: 12px 14px; }
+.card .nm { font-weight: 600; }
+.card .ct { font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--free); line-height: 1.1; }
+.card .ct.zero { color: var(--ink-3); }
+.card small { color: var(--ink-3); font-size: 12px; }
+.card[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.note { margin: 0; font-size: 13px; color: var(--ink-2); }
+.ghost { border: 1px solid var(--rule); background: transparent; border-radius: 8px; padding: 5px 10px; color: var(--ink-2); font-size: 13px; flex: none; }
+
+.detail-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.detail-h .t { display: flex; flex-direction: column; gap: 2px; }
+.detail-h .b { font-size: 13px; color: var(--ink-3); }
+.detail-h .r { font-family: var(--mono); font-size: 26px; font-weight: 600; line-height: 1.15; }
+.detail-h .s { font-size: 13px; color: var(--ink-2); }
+.state { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+.state.free { background: var(--free-bg); color: var(--free); }
+.state.maybe { background: var(--maybe-bg); color: var(--maybe); }
+.state.busy { background: var(--accent-soft); color: var(--accent); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; background: var(--accent-soft); border: 1px solid var(--accent-line); }
+.legend i.p { background: var(--card); border-style: dashed; }
+.legend i.x { background: var(--card); border-style: dotted; border-width: 2px; }
+.legend i.w { background: var(--band); border-color: transparent; }
+.tt-scroll { overflow-x: auto; }
+.tt { min-width: 420px; }
+.tt-head, .tt-body { display: grid; grid-template-columns: 44px repeat(var(--cols), minmax(0, 1fr)); }
+.tt-head span { text-align: center; font-size: 13px; font-weight: 600; color: var(--ink-2); padding-bottom: 6px; }
+.tt-head span.sel { color: var(--accent); }
+.tt-body { height: calc(var(--rows) * var(--rh)); border-top: 1px solid var(--rule); }
+.tt-hours { position: relative; }
+.tt-hours span { position: absolute; right: 8px; transform: translateY(-50%); font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.tt-hours span:first-child { transform: none; }
+.tt-day { position: relative; border-left: 1px solid var(--rule); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--rh) - 1px), var(--rule) calc(var(--rh) - 1px), var(--rule) var(--rh)); }
+.tt-band { position: absolute; left: 0; right: 0; background: var(--band); pointer-events: none; }
+.blk { position: absolute; box-sizing: border-box; padding: 3px 5px; border-radius: 5px; background: var(--accent-soft); border: 1px solid var(--accent-line); font-size: 12px; line-height: 1.3; overflow: hidden; color: var(--ink); }
+.blk.p { background: var(--card); border-style: dashed; }
+.blk.x { background: var(--card); border-style: dotted; border-width: 2px; }
+.blk small { display: block; color: var(--ink-2); font-size: 11px; }
+.crumb { align-self: flex-start; }
+
+.notes { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 13px; }
+.notes ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; max-width: 72ch; }
+.notes a { color: var(--accent); }
+.loading { color: var(--ink-2); }
+@media (max-width: 560px) { :root { --rh: 34px; } .brand h1 { font-size: 22px; } .mappanel { padding: 14px; } .detail-h .r { font-size: 22px; } }
+@media (prefers-reduced-motion: no-preference) { .plate, .seg button, .rank button { transition: background-color .12s, border-color .12s; } }
+@media (prefers-reduced-motion: reduce) { .m-b { transition: none; } }
+</style>
+<script>try { var t0 = localStorage.getItem('gc.theme'); if (t0 === 'light' || t0 === 'dark') document.documentElement.setAttribute('data-mode', t0); } catch (e) {}</script>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>가천 빈 강의실</h1>
+      <p id="srcLine">학교 시간표를 불러오는 중</p>
+    </div>
+    <div class="hdr-ctl">
+      <div class="seg" id="campusSeg" aria-label="캠퍼스">
+        <button type="button" data-c="G" aria-pressed="true">글로벌캠퍼스</button>
+        <button type="button" data-c="M" aria-pressed="false">메디컬캠퍼스</button>
+      </div>
+      <div class="seg icon" id="themeSeg" aria-label="화면 모드">
+        <button type="button" data-t="system" aria-pressed="true" aria-label="시스템 설정 따르기" title="시스템 설정 따르기"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
+        <button type="button" data-t="light" aria-pressed="false" aria-label="라이트 모드" title="라이트 모드"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+        <button type="button" data-t="dark" aria-pressed="false" aria-label="다크 모드" title="다크 모드"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <section class="toolbar" aria-label="찾기 조건">
+    <div class="tgroup days-g">
+      <span class="label">요일</span>
+      <div class="seg days" id="daySeg" aria-label="요일"></div>
+    </div>
+    <div class="tgroup">
+      <span class="label">시간</span>
+      <div class="hours">
+        <select id="startSel" aria-label="시작 시각"></select>
+        <span aria-hidden="true">–</span>
+        <select id="endSel" aria-label="끝 시각"></select>
+        <button type="button" class="now" id="nowBtn" aria-pressed="false">지금</button>
+      </div>
+    </div>
+    <div class="tgroup grow">
+      <label class="label" for="roomSearch">강의실 시간표 보기</label>
+      <form class="search" id="searchForm" autocomplete="off">
+        <input id="roomSearch" list="roomList" placeholder="가천관 612">
+        <button type="submit">보기</button>
+      </form>
+      <datalist id="roomList"></datalist>
+      <p class="err" id="searchErr" hidden></p>
+    </div>
+    <div class="tgroup" id="semField" hidden>
+      <label class="label" for="semSel">학기</label>
+      <div class="hours"><select id="semSel"></select></div>
+    </div>
+  </section>
+
+  <p class="summary" id="summary"><span class="loading">시간표 불러오는 중…</span></p>
+  <div id="mapView">
+    <div class="mapwrap">
+      <div id="mapMain"></div>
+      <aside class="mappanel" id="mapPanel" aria-live="polite"></aside>
+    </div>
+  </div>
+
+  <footer class="notes">
+    <ul>
+      <li>출처: <a href="https://info.gachon.ac.kr/ssu/showTimetable.do">가천대학교 시간표 및 강의계획서 조회</a>. 페이지를 열면 학교 서버에서 시간표를 바로 받아오고, 받은 시간표는 이 브라우저에 6시간 동안 보관해요. 학교 서버에 연결되지 않으면 매일 자동으로 갱신하는 저장본을 보여줘요. 학기는 날짜에 맞춰 자동으로 바뀌어요(3~8월 1학기, 9~2월 2학기). 학교와 관계없는 학생용 비공식 페이지예요.</li>
+      <li>지도: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap 기여자</a>의 건물·길 데이터로 그렸어요. 메디컬캠퍼스 건물 이름은 카카오맵·네이버 지도 표시와 건물 주소로 확인했어요(의과학대학은 지도에 옛 이름 보건과학대학으로 나와요). 의과대학은 메디컬캠퍼스가 아니라 남동구 구월동 가천대길병원 옆에 있어서 지도 아래에 따로 표시해요. 바이오나노대학은 위치를 확인하지 못해서 지도 옆 건물 목록에만 나와요.</li>
+      <li>교시는 1교시 09:00부터 교시당 1시간으로 계산했어요.</li>
+      <li>시간표에 있는 정규 수업만 반영해요. 보강, 시험, 행사, 스터디룸 예약, 문 잠김은 알 수 없어요.</li>
+      <li>이번 학기 수업이 하나도 없는 강의실은 목록에 나오지 않아요.</li>
+      <li><b>확인 필요</b>는 12주·4주처럼 학기 일부 기간만 하는 수업이나, 강의실이 여러 곳으로 적힌 수업이 걸려 있어서 실제로는 쓰일 수도 있는 강의실이에요.</li>
+    </ul>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
+  const DAY_FULL = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+  const TERM = { '10': '1학기', '11': '여름계절', '20': '2학기', '21': '겨울계절' };
+  const FIRST = 9, LAST = 23;
+  const SKIP = /가상|테니스장|종합운동장|체육관/;
+  const MAP_ALIAS = { '예술대학1': '예술ㆍ체육대학1', '예술대학2': '예술ㆍ체육대학2', 'AI관': 'AI공학관', '제3생활관': '제3학생생활관' };
+  const $ = (id) => document.getElementById(id);
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const hhmm = (t) => { const h = Math.floor(t + 1e-9), m = Math.round((t - h) * 60); return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0'); };
+  const byNo = (a, b) => a.no.localeCompare(b.no, 'ko', { numeric: true });
+  const ko = (a, b) => a.localeCompare(b, 'ko', { numeric: true });
+  const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const narrow = () => window.matchMedia && matchMedia('(max-width: 919px)').matches;
+
+  const S = {
+    campus: store.get('gc.campus') === 'M' ? 'M' : 'G',
+    mapBld: '',
+    day: 0, ws: 9, we: 10, nowMode: false, room: null, sem: null
+  };
+  let ROOMS = new Map(), GEOS = {}, LAST_RES = null;
+
+  function seoulNow() {
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Seoul', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date());
+    const get = (t) => parts.find((p) => p.type === t).value;
+    const wd = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(get('weekday'));
+    return { day: wd, t: +get('hour') + +get('minute') / 60 };
+  }
+
+  function build(sem) {
+    const rooms = new Map();
+    for (const g of Object.keys(sem.campuses)) for (const r of sem.campuses[g]) {
+      const [code, name, prof, isu, time, loc] = r;
+      const locs = String(loc || '').split(',').map((s) => s.trim()).filter((s) => s && !SKIP.test(s));
+      if (!locs.length || !time) continue;
+      const byDay = new Map();
+      for (const tok of time.split(',')) {
+        const m = tok.trim().match(/^([월화수목금토일])(\d+)$/);
+        if (!m) continue;
+        const d = DAYS.indexOf(m[1]);
+        if (!byDay.has(d)) byDay.set(d, []);
+        byDay.get(d).push(+m[2]);
+      }
+      const blocks = [];
+      for (const [d, ps] of byDay) {
+        ps.sort((a, b) => a - b);
+        let s = ps[0], prev = ps[0];
+        for (let i = 1; i <= ps.length; i++) {
+          const p = ps[i];
+          if (p === prev) continue;
+          if (p === prev + 1) { prev = p; continue; }
+          blocks.push({ d, s: FIRST + s - 1, e: FIRST + prev });
+          s = prev = p;
+        }
+      }
+      const wk = name.match(/\((\d+)주/);
+      const partial = wk && +wk[1] < 15 ? wk[1] + '주' : null;
+      const multi = locs.length > 1;
+      const course = { code, name, prof, isu, partial, multi, blocks, locs };
+      for (const L of locs) {
+        let room = rooms.get(L);
+        if (!room) {
+          const i = L.indexOf('-');
+          const raw = i < 0 ? L : L.slice(0, i);
+          room = { key: L, campus: raw.startsWith('(M)') ? 'M' : 'G', bld: raw.replace(/^\(M\)/, ''), no: i < 0 ? '' : L.slice(i + 1), blocks: [], courses: [] };
+          room.label = room.bld + (room.no ? ' ' + room.no : '');
+          rooms.set(L, room);
+        }
+        room.courses.push(course);
+        for (const b of blocks) room.blocks.push({ d: b.d, s: b.s, e: b.e, c: course, sure: !partial && !multi });
+      }
+    }
+    return rooms;
+  }
+
+  function status(room, d, ws, we) {
+    const sure = [], unsure = [];
+    for (const b of room.blocks) if (b.d === d && b.s < we && ws < b.e) (b.sure ? sure : unsure).push(b);
+    let next = null;
+    for (const b of room.blocks) if (b.d === d && b.sure && b.s >= we && (next === null || b.s < next)) next = b.s;
+    if (sure.length) return { st: 'busy', blocks: sure, next };
+    return { st: unsure.length ? 'maybe' : 'free', blocks: unsure, next };
+  }
+  const reason = (blocks) => blocks[0].c.partial ? blocks[0].c.partial + ' 수업' : '여러 강의실';
+  const campusRooms = () => [...ROOMS.values()].filter((r) => r.campus === S.campus);
+
+  function compute() {
+    const res = campusRooms().map((r) => ({ r, ...status(r, S.day, S.ws, S.we) }));
+    const groups = new Map();
+    for (const x of res) { if (!groups.has(x.r.bld)) groups.set(x.r.bld, []); groups.get(x.r.bld).push(x); }
+    const stats = new Map();
+    for (const [n, list] of groups) stats.set(n, { name: n, total: list.length, free: list.filter((x) => x.st === 'free').length, maybe: list.filter((x) => x.st === 'maybe').length, list });
+    return { res, groups, stats, names: [...groups.keys()].sort(ko) };
+  }
+
+  function platesHTML(list) {
+    return list.filter((x) => x.st !== 'busy').sort((a, b) => byNo(a.r, b.r)).map((x) => {
+      const sub = x.st === 'free' ? (x.next !== null ? `~${hhmm(x.next)}` : '이후 수업 없음') : reason(x.blocks);
+      const cur = S.room === x.r.key ? ' aria-current="true"' : '';
+      return `<button type="button" class="plate ${x.st}" data-room="${esc(x.r.key)}"${cur} aria-label="${esc(x.r.label)}, ${x.st === 'free' ? '비어 있음' : '확인 필요'}, ${esc(sub)}"><span class="no">${esc(x.r.no || x.r.bld)}</span><span class="sub">${esc(sub)}</span></button>`;
+    }).join('');
+  }
+
+  function renderControls() {
+    for (const b of $('campusSeg').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.c === S.campus));
+    $('daySeg').innerHTML = DAYS.map((d, i) => `<button type="button" data-d="${i}" aria-pressed="${i === S.day}" aria-label="${DAY_FULL[i]}">${d}</button>`).join('');
+    const opts = (from, to, sel) => { let h = ''; for (let x = from; x <= to; x++) h += `<option value="${x}"${x === sel ? ' selected' : ''}>${String(x).padStart(2, '0')}:00</option>`; return h; };
+    const ws = Math.floor(S.ws), we = Math.max(ws + 1, Math.ceil(S.we));
+    $('startSel').innerHTML = opts(FIRST, LAST - 1, ws);
+    $('endSel').innerHTML = opts(FIRST + 1, LAST, we);
+    $('nowBtn').setAttribute('aria-pressed', String(S.nowMode));
+    $('roomList').innerHTML = campusRooms().sort((a, b) => ko(a.label, b.label)).map((r) => `<option value="${esc(r.label)}"></option>`).join('');
+  }
+
+  function render() {
+    const R = LAST_RES = compute();
+    const freeAll = R.res.filter((x) => x.st === 'free').length, maybeAll = R.res.filter((x) => x.st === 'maybe').length;
+    if (S.mapBld && !mapGroupExists(R, S.mapBld)) S.mapBld = '';
+    if (S.room && !ROOMS.has(S.room)) S.room = null;
+
+    const when = S.nowMode ? `지금 · ${DAY_FULL[S.day]} ${hhmm(S.ws)}` : `${DAY_FULL[S.day]} ${hhmm(S.ws)}–${hhmm(S.we)}`;
+    $('summary').innerHTML = `<span class="when">${when}</span><span class="counts">빈 강의실 <b class="f">${freeAll}</b>곳 · 확인 필요 <b class="m">${maybeAll}</b>곳 · 수업 중 <b>${R.res.length - freeAll - maybeAll}</b>곳</span>`;
+    renderMap(R);
+  }
+
+  /* ---------- map view ---------- */
+  const mapKey = (bld) => MAP_ALIAS[bld] || bld;
+  function mapGroups(R) {
+    const g = new Map();
+    for (const n of R.names) {
+      const k = S.campus === 'G' ? mapKey(n) : n;
+      if (!g.has(k)) g.set(k, { key: k, names: [], free: 0, maybe: 0, total: 0, list: [] });
+      const e = g.get(k), s = R.stats.get(n);
+      e.names.push(n); e.free += s.free; e.maybe += s.maybe; e.total += s.total; e.list.push(...s.list);
+    }
+    return g;
+  }
+  const mapGroupExists = (R, k) => mapGroups(R).has(k);
+  const level = (f) => f === 0 ? 'l0' : f < 5 ? 'l1' : f < 10 ? 'l2' : 'l3';
+  const displayName = (e) => e.names.length === 1 ? e.names[0] : e.key;
+
+  function renderMap(R) {
+    const G = mapGroups(R);
+    if (GEOS[S.campus]) drawSvgMap(G); else drawCards(G);
+    renderPanel(G);
+  }
+
+  function drawCards(G) {
+    const list = [...G.values()].sort((a, b) => ko(displayName(a), displayName(b)));
+    $('mapMain').innerHTML = `<div class="board"><p class="note">지도 데이터를 불러오지 못해서 건물 카드로 보여드려요.</p><div class="cards">${list.map((e) => `<button type="button" class="card" data-mb="${esc(e.key)}" aria-pressed="${S.mapBld === e.key}"><span class="nm">${esc(displayName(e))}</span><span class="ct${e.free ? '' : ' zero'}">${e.free}</span><small>빈 강의실 · 확인 필요 ${e.maybe} · 전체 ${e.total}</small></button>`).join('')}</div></div>`;
+  }
+
+  function drawSvgMap(G) {
+    const GEO = GEOS[S.campus];
+    const { W, H } = GEO;
+    const fields = (GEO.fields || []).map((f) => `<path class="m-field" d="${f.d}"/>`).join('');
+    const majors = GEO.roads.filter((r) => r.k === 'major').map((r) => `<path class="m-major" d="${r.d}"/>`).join('');
+    const minors = GEO.roads.filter((r) => r.k === 'road').map((r) => `<path class="m-road" d="${r.d}"/>`).join('');
+    const paths = GEO.roads.filter((r) => r.k === 'path').map((r) => `<path class="m-path" d="${r.d}"/>`).join('');
+    const blds = GEO.buildings.map((b, i) => {
+      const e = b.name && G.get(b.name);
+      if (!e) return `<path class="m-b idle" d="${b.d}"/>`;
+      const sel = S.mapBld === e.key ? ' sel' : '';
+      return `<g class="m-hit" data-mb="${esc(e.key)}"><path class="m-b ${level(e.free)}${sel}" d="${b.d}"/></g>`;
+    }).join('');
+    $('mapMain').innerHTML = `<figure class="map"><svg id="mapSvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${S.campus === 'G' ? '글로벌' : '메디컬'}캠퍼스 지도. 건물 색이 진할수록 빈 강의실이 많아요."><path class="m-campus" d="${GEO.campus}"/>${fields}${majors}${minors}${paths}${blds}<g id="mapOverlay"></g></svg>
+      ${offsiteHTML(G, GEO)}<figcaption><span class="mlegend"><span>빈 강의실</span><span><i style="background:var(--b-busy)"></i>0</span><span><i style="background:var(--g1)"></i>1–4</span><span><i style="background:var(--g2)"></i>5–9</span><span><i style="background:var(--g3)"></i>10+</span><span><i style="background:var(--b-idle)"></i>수업 없음</span></span><a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a></figcaption></figure>`;
+    drawOverlay(G);
+  }
+
+  function offsiteHTML(G, GEO) {
+    const list = (GEO.offsite || []).map((o) => ({ o, e: G.get(o.name) })).filter((x) => x.e);
+    if (!list.length) return '';
+    return `<div class="offsite">${list.map(({ o, e }) => `<button type="button" data-mb="${esc(e.key)}" aria-pressed="${S.mapBld === e.key}"><span class="nm">${esc(o.name)}</span><span class="wh">${esc(o.where)} · 지도 밖</span><span class="ct">${e.free}</span></button>`).join('')}</div>`;
+  }
+
+  function drawOverlay(G) {
+    const svg = $('mapSvg'), ov = $('mapOverlay'), GEO = GEOS[S.campus];
+    if (!svg || !ov || !GEO) return;
+    const w = svg.getBoundingClientRect().width || 600;
+    const k = GEO.W / w;
+    const placed = [];
+    const hit = (r) => placed.some((p) => r.x < p.x + p.w && p.x < r.x + r.w && r.y < p.y + p.h && p.y < r.y + r.h);
+    const inView = (r) => r.x >= 2 && r.y >= 2 && r.x + r.w <= GEO.W - 2 && r.y + r.h <= GEO.H - 2;
+    const tw = (s, px) => [...s].reduce((a, c) => a + (/[가-힣ㆍ]/.test(c) ? 1 : 0.6), 0) * px * k;
+    let html = '';
+    const st = GEO.station;
+    if (st) {
+      const fs = 12 * k;
+      html += `<g class="m-st" aria-hidden="true"><rect x="${st.xy[0] - 5 * k}" y="${st.xy[1] - 5 * k}" width="${10 * k}" height="${10 * k}" rx="${2 * k}"/><text x="${st.xy[0] + 9 * k}" y="${st.xy[1] - 9 * k}" font-size="${fs}">${esc(st.name)}</text></g>`;
+      placed.push({ x: st.xy[0] - 6 * k, y: st.xy[1] - 22 * k, w: tw(st.name, 12) + 18 * k, h: 30 * k });
+    }
+    const items = GEO.buildings.filter((b) => b.name).map((b) => ({ b, e: G.get(b.name) || null }));
+    const seen = new Set();
+    const active = items.filter((x) => x.e && !seen.has(x.e.key) && seen.add(x.e.key)).sort((a, b) => b.e.free - a.e.free);
+    const idle = items.filter((x) => !x.e).concat((GEO.fields || []).map((f) => ({ b: f, e: null })));
+    const r = 12 * k;
+    const offs = [[0, 0], [2.2, 0], [-2.2, 0], [0, -2.2], [0, 2.2], [1.8, 1.8], [-1.8, 1.8], [1.8, -1.8], [-1.8, -1.8]];
+    for (const x of active) {
+      const o = offs.find(([dx, dy]) => { const rr = { x: x.b.x + dx * r - r, y: x.b.y + dy * r - r, w: 2 * r, h: 2 * r }; return inView(rr) && !hit(rr); }) || [0, 0];
+      x.cx = x.b.x + o[0] * r; x.cy = x.b.y + o[1] * r;
+      placed.push({ x: x.cx - r, y: x.cy - r, w: 2 * r, h: 2 * r });
+    }
+    let bubbles = '', labels = '';
+    for (const x of active) {
+      const e = x.e, sel = S.mapBld === e.key ? ' sel' : '';
+      const lead = (x.cx !== x.b.x || x.cy !== x.b.y) ? `<line x1="${x.b.x}" y1="${x.b.y}" x2="${x.cx}" y2="${x.cy}" stroke="var(--ink-3)" stroke-width="${1.2 * k}"/>` : '';
+      bubbles += `<g class="m-bub m-hit${e.free ? '' : ' zero'}${sel}" data-mb="${esc(e.key)}" tabindex="0" role="button" aria-label="${esc(displayName(e))} 빈 강의실 ${e.free}곳">${lead}<circle cx="${x.cx}" cy="${x.cy}" r="${r}" stroke-width="${1.6 * k}"/><text x="${x.cx}" y="${x.cy}" font-size="${11.5 * k}">${e.free}</text></g>`;
+      const name = displayName(e), fs = 12.5 * k, w = tw(name, 12.5), h = 15 * k, gap = 4 * k;
+      const cands = [
+        { x: x.cx + r + gap, y: x.cy - h / 2 },
+        { x: x.cx - r - gap - w, y: x.cy - h / 2 },
+        { x: x.cx - w / 2, y: x.cy - r - gap - h },
+        { x: x.cx - w / 2, y: x.cy + r + gap }
+      ];
+      const c = cands.find((c) => { const rr = { x: c.x, y: c.y, w, h }; return inView(rr) && !hit(rr); });
+      if (c) { placed.push({ x: c.x, y: c.y, w, h }); labels += `<text class="m-lbl" x="${c.x}" y="${c.y + h * 0.78}" font-size="${fs}" stroke-width="${3 * k}">${esc(name)}</text>`; }
+    }
+    for (const x of idle) {
+      const name = x.b.name, fs = 11 * k, w = tw(name, 11), h = 13 * k;
+      const cands = [{ x: x.b.x - w / 2, y: x.b.y - h / 2 }, { x: x.b.x - w / 2, y: x.b.y - h - 6 * k }, { x: x.b.x - w / 2, y: x.b.y + 6 * k }];
+      const c = cands.find((c) => { const rr = { x: c.x, y: c.y, w, h }; return inView(rr) && !hit(rr); });
+      if (c) { placed.push({ x: c.x, y: c.y, w, h }); labels += `<text class="m-lbl idle" x="${c.x}" y="${c.y + h * 0.78}" font-size="${fs}" stroke-width="${3 * k}">${esc(name)}</text>`; }
+    }
+    const sx = GEO.W - 24 * k - 100, sy = GEO.H - 22 * k;
+    const scale = `<g class="m-scale" aria-hidden="true"><line x1="${sx}" y1="${sy}" x2="${sx + 100}" y2="${sy}" stroke-width="${2 * k}"/><line x1="${sx}" y1="${sy - 4 * k}" x2="${sx}" y2="${sy + 4 * k}" stroke-width="${2 * k}"/><line x1="${sx + 100}" y1="${sy - 4 * k}" x2="${sx + 100}" y2="${sy + 4 * k}" stroke-width="${2 * k}"/><text x="${sx + 50}" y="${sy - 8 * k}" font-size="${11 * k}" text-anchor="middle">100 m</text></g>`;
+    ov.innerHTML = html + labels + bubbles + scale;
+  }
+
+  function renderPanel(G) {
+    const el = $('mapPanel'), GEO = GEOS[S.campus];
+    const room = S.room && ROOMS.get(S.room);
+    if (room) {
+      const grp = S.mapBld && G.get(S.mapBld);
+      el.innerHTML = roomHTML(room, grp ? displayName(grp) : room.bld);
+      $('roomBack').onclick = () => { S.room = null; render(); };
+      return;
+    }
+    const e = S.mapBld && G.get(S.mapBld);
+    if (!e) {
+      const onMap = new Set(GEO ? GEO.buildings.map((b) => b.name) : []);
+      const off = new Map(((GEO && GEO.offsite) || []).map((o) => [o.name, o]));
+      const tag = (k) => !GEO || onMap.has(k) ? '' : off.has(k) ? '<small>길병원 옆</small>' : '<small>지도 위치 없음</small>';
+      const list = [...G.values()].sort((a, b) => ko(displayName(a), displayName(b)));
+      el.innerHTML = `<div class="mp-h"><div><h2>건물</h2><p>${GEO ? '지도에서 건물이나 숫자를 눌러도 돼요.' : '카드를 누르면 빈 강의실이 나와요.'}</p></div></div>
+        <div class="rank">${list.map((x) => `<button type="button" data-mb="${esc(x.key)}"><span class="nm">${esc(displayName(x))}${tag(x.key)}</span><span class="f">${x.free}</span><span class="m">${x.maybe ? '+' + x.maybe : ''}</span></button>`).join('')}</div>
+        <p class="note">초록 숫자는 빈 강의실, 노란 숫자는 확인 필요 강의실 수예요.</p>`;
+      return;
+    }
+    const offsite = GEO && (GEO.offsite || []).find((o) => o.name === e.key);
+    const geo = offsite || (GEO ? GEO.buildings.find((b) => b.name === e.key) : null);
+    const q = (S.campus === 'M' && !offsite ? '가천대학교 메디컬캠퍼스 ' : '가천대학교 ') + displayName(e);
+    const links = geo
+      ? `<a href="https://map.kakao.com/link/map/${encodeURIComponent(q)},${geo.lat},${geo.lon}">카카오맵</a><a href="https://map.naver.com/p/search/${encodeURIComponent(q)}">네이버 지도</a><a href="https://www.google.com/maps/search/?api=1&query=${geo.lat},${geo.lon}">구글 지도</a>`
+      : `<a href="https://map.kakao.com/?q=${encodeURIComponent(q)}">카카오맵</a><a href="https://map.naver.com/p/search/${encodeURIComponent(q)}">네이버 지도</a><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}">구글 지도</a>`;
+    const plates = platesHTML(e.list);
+    el.innerHTML = `<div class="mp-h"><div><h2>${esc(displayName(e))}</h2><p>빈 강의실 ${e.free} · 확인 필요 ${e.maybe} · 전체 ${e.total}</p></div><button type="button" class="ghost" id="panelBack">건물 목록</button></div>
+      ${offsite ? `<p class="note">메디컬캠퍼스가 아니라 ${esc(offsite.where)}에 있어요.</p>` : ''}
+      <div class="links">${links}</div>
+      ${plates ? `<div class="plates">${plates}</div>` : `<div class="empty">이 시간에는 모든 강의실에 수업이 있어요.</div>`}`;
+    $('panelBack').onclick = () => { S.mapBld = ''; render(); };
+  }
+
+  function selectMapBld(k) {
+    S.mapBld = S.mapBld === k && !S.room ? '' : k;
+    S.room = null;
+    render();
+    $('mapPanel').scrollTop = 0;
+    if (S.mapBld && narrow()) $('mapPanel').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  /* ---------- room timetable (inside the panel) ---------- */
+  function roomHTML(room, bldName) {
+    const st = status(room, S.day, S.ws, S.we);
+    const stTxt = st.st === 'free' ? '비어 있음' : st.st === 'maybe' ? '확인 필요' : '수업 중';
+    const daysShown = [0, 1, 2, 3, 4];
+    for (const d of [5, 6]) if (room.blocks.some((b) => b.d === d) || S.day === d) daysShown.push(d);
+    const maxE = Math.max(19, ...room.blocks.map((b) => b.e), Math.ceil(S.we));
+    const H0 = FIRST, H1 = Math.min(LAST, maxE), rows = H1 - H0;
+    const rh = getComputedStyle(document.documentElement).getPropertyValue('--rh').trim() || '40px';
+    const px = (h) => `calc(${h - H0} * ${rh})`;
+    let hours = '';
+    for (let h = H0; h < H1; h++) hours += `<span style="top:${px(h)}">${String(h).padStart(2, '0')}</span>`;
+    const cols = daysShown.map((d) => {
+      const bs = room.blocks.filter((b) => b.d === d).sort((a, b) => a.s - b.s || b.e - a.e);
+      const lanes = [], clusters = [];
+      let cl = null, clEnd = -1;
+      for (const b of bs) {
+        if (b.s >= clEnd) { cl = []; clusters.push(cl); lanes.length = 0; }
+        let li = lanes.findIndex((end) => end <= b.s);
+        if (li < 0) { li = lanes.length; lanes.push(b.e); } else lanes[li] = b.e;
+        b._lane = li; cl.push(b); clEnd = Math.max(clEnd, b.e);
+        cl.n = Math.max(cl.n || 0, lanes.length);
+      }
+      let html = '';
+      if (d === S.day) {
+        const a = Math.max(H0, S.ws), z = Math.min(H1, S.nowMode ? S.ws + 0.25 : S.we);
+        if (z > a) html += `<div class="tt-band" style="top:${px(a)};height:calc(${z - a} * ${rh})"></div>`;
+      }
+      for (const c of clusters) for (const b of c) {
+        const w = 100 / c.n;
+        const cls = b.c.partial ? 'p' : b.c.multi ? 'x' : '';
+        const tip = `${b.c.name} · ${b.c.prof || '담당교수 미정'} · ${hhmm(b.s)}–${hhmm(b.e)}${b.c.partial ? ' · ' + b.c.partial : ''}${b.c.multi ? ' · 강의실 여러 곳' : ''}`;
+        html += `<div class="blk ${cls}" title="${esc(tip)}" style="top:calc(${px(b.s)} + 1px);height:calc(${b.e - b.s} * ${rh} - 2px);left:calc(${b._lane * w}% + 2px);width:calc(${w}% - 4px)">${esc(b.c.name)}<small>${esc(b.c.prof || '')}</small></div>`;
+      }
+      return `<div class="tt-day">${html}</div>`;
+    }).join('');
+    const head = `<span></span>` + daysShown.map((d) => `<span class="${d === S.day ? 'sel' : ''}">${DAYS[d]}</span>`).join('');
+    const seen = new Set(room.courses.map((c) => c.code));
+    return `
+      <button type="button" class="ghost crumb" id="roomBack">← ${esc(bldName)} 빈 강의실</button>
+      <div class="detail-h">
+        <div class="t"><span class="b">${esc(room.bld)}</span><span class="r">${esc(room.no || room.bld)}</span><span class="s">이번 학기 수업 ${seen.size}개</span></div>
+        <span class="state ${st.st}">${DAY_FULL[S.day]} ${S.nowMode ? '지금' : hhmm(S.ws) + '–' + hhmm(S.we)} ${stTxt}</span>
+      </div>
+      <div class="legend"><span><i></i>정규 수업</span><span><i class="p"></i>일부 기간 수업</span><span><i class="x"></i>강의실 여러 곳</span><span><i class="w"></i>고른 시간</span></div>
+      <div class="tt-scroll"><div class="tt" style="--cols:${daysShown.length};--rows:${rows}">
+        <div class="tt-head">${head}</div>
+        <div class="tt-body"><div class="tt-hours">${hours}</div>${cols}</div>
+      </div></div>`;
+  }
+
+  function openRoom(key) {
+    const room = ROOMS.get(key);
+    if (!room) return;
+    S.room = key;
+    S.mapBld = S.campus === 'G' ? mapKey(room.bld) : room.bld;
+    render();
+    if (narrow()) $('mapPanel').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+    else $('mapPanel').scrollTop = 0;
+  }
+
+  function setNow() {
+    const n = seoulNow();
+    S.day = n.day;
+    if (n.t >= FIRST && n.t < LAST) { S.nowMode = true; S.ws = n.t; S.we = n.t + 1 / 60; }
+    else { S.nowMode = false; if (n.t >= LAST) S.day = (n.day + 1) % 7; S.ws = FIRST; S.we = FIRST + 1; }
+  }
+
+  const norm = (s) => s.replace(/\(M\)/g, '').replace(/[\s\-]/g, '').toLowerCase();
+
+  function applyTheme(t) {
+    const mode = t === 'light' || t === 'dark' ? t : 'system';
+    if (mode === 'system') document.documentElement.removeAttribute('data-mode');
+    else document.documentElement.setAttribute('data-mode', mode);
+    for (const b of $('themeSeg').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.t === mode));
+  }
+
+  function bind() {
+    applyTheme(store.get('gc.theme'));
+    $('themeSeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; store.set('gc.theme', b.dataset.t); applyTheme(b.dataset.t); };
+    $('campusSeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.campus = b.dataset.c; S.mapBld = ''; S.room = null; store.set('gc.campus', S.campus); renderControls(); render(); };
+    $('daySeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.day = +b.dataset.d; if (S.nowMode) { S.nowMode = false; S.ws = Math.floor(S.ws); S.we = S.ws + 1; } renderControls(); render(); };
+    $('startSel').onchange = () => { S.nowMode = false; S.ws = +$('startSel').value; if (S.we <= S.ws) S.we = S.ws + 1; S.we = Math.ceil(S.we); renderControls(); render(); };
+    $('endSel').onchange = () => { S.nowMode = false; S.we = +$('endSel').value; S.ws = Math.floor(S.ws); if (S.ws >= S.we) S.ws = S.we - 1; renderControls(); render(); };
+    $('nowBtn').onclick = () => { setNow(); renderControls(); render(); };
+    const roomClick = (e) => { const b = e.target.closest('[data-room]'); if (b) { openRoom(b.dataset.room); return true; } return false; };
+    $('mapPanel').onclick = (e) => { if (roomClick(e)) return; const b = e.target.closest('[data-mb]'); if (b) selectMapBld(b.dataset.mb); };
+    $('mapMain').onclick = (e) => { const b = e.target.closest('[data-mb]'); if (b) selectMapBld(b.dataset.mb); };
+    $('mapMain').onkeydown = (e) => { if (e.key !== 'Enter' && e.key !== ' ') return; const b = e.target.closest('[data-mb]'); if (b) { e.preventDefault(); selectMapBld(b.dataset.mb); } };
+    $('roomSearch').oninput = () => { $('searchErr').hidden = true; };
+    $('searchForm').onsubmit = (e) => {
+      e.preventDefault();
+      const q = norm($('roomSearch').value);
+      const fail = (m) => { $('searchErr').textContent = m; $('searchErr').hidden = false; };
+      if (!q) return fail('강의실 이름을 입력하세요. 예: 가천관 612');
+      const all = campusRooms();
+      let hit = all.find((r) => norm(r.label) === q);
+      if (!hit) { const c = all.filter((r) => norm(r.label).includes(q)); if (c.length === 1) hit = c[0]; else if (c.length > 1) return fail(`${c.length}곳이 맞아요. 건물 이름까지 입력해 보세요.`); }
+      if (!hit) { const other = [...ROOMS.values()].find((r) => r.campus !== S.campus && norm(r.label) === q); return fail(other ? '다른 캠퍼스 강의실이에요. 위에서 캠퍼스를 바꿔 보세요.' : '이번 학기 수업이 있는 강의실 중에 찾지 못했어요.'); }
+      $('searchErr').hidden = true;
+      openRoom(hit.key);
+    };
+    $('semSel').onchange = () => loadSem($('semSel').value);
+    let rt = null;
+    const ro = new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => { if (GEOS[S.campus] && LAST_RES) drawOverlay(mapGroups(LAST_RES)); }, 80); });
+    ro.observe($('mapMain'));
+  }
+
+  /* ---------- semesters: saved copy first, then live from the school's timetable service ---------- */
+  const API = 'https://info.gachon.ac.kr/Ssu1000q/mainSearch.do';
+  const GROUPS = ['20', '21'], ISU = ['002', '001', '004', '003', '005', '006'];
+  const LIVE_TTL = 6 * 3600e3, MIN_SCHEDULED = 50;
+  const pad = (n) => String(n).padStart(2, '0');
+  const semKey = (t) => `${t.year}-${t.term}`;
+  const semLabel = (t) => `${t.year}년 ${TERM[t.term] || t.term}`;
+  const termByDate = () => { const d = new Date(Date.now() + 9 * 3600e3); const y = d.getUTCFullYear(), m = d.getUTCMonth() + 1; return m >= 3 && m <= 8 ? { year: y, term: '10' } : m >= 9 ? { year: y, term: '20' } : { year: y - 1, term: '20' }; };
+  const nextTerm = (t) => t.term === '10' ? { year: t.year, term: '20' } : { year: t.year + 1, term: '10' };
+  const scheduledCount = (d) => Object.values(d.campuses).flat().filter((r) => r[4] && r[5]).length;
+  let SEMS = [], loadSeq = 0, lastSrc = null;
+
+  async function liveFetch(t) {
+    const jobs = [];
+    for (const g of GROUPS) for (const isu of ISU) jobs.push({ g, isu });
+    const results = new Array(jobs.length);
+    let next = 0;
+    const worker = async () => {
+      while (next < jobs.length) {
+        const i = next++, { g, isu } = jobs[i];
+        const body = new URLSearchParams();
+        const f = { groupType: g, searchYear: String(t.year), searchTerm: t.term, searchUnivCD: '', searchDeptCD: '', searchIsuCD: isu, searchGrade: '', searchSubjectNm: '' };
+        for (const [k, v] of Object.entries(f)) body.append('@d1#' + k, v);
+        body.append('@d#', '@d1#'); body.append('@d1#', 'SendData'); body.append('@d1#tp', 'dm');
+        const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 20000);
+        try {
+          const r = await fetch(API, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }, body: body.toString(), signal: ctl.signal });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const j = await r.json();
+          if (!Array.isArray(j.MainData)) throw new Error('unexpected response');
+          results[i] = { g, rows: j.MainData };
+        } finally { clearTimeout(tm); }
+      }
+    };
+    await Promise.all([worker(), worker(), worker(), worker()]);
+    const campuses = {};
+    for (const g of GROUPS) campuses[g] = [];
+    const seen = Object.fromEntries(GROUPS.map((g) => [g, new Set()]));
+    for (const { g, rows } of results) for (const r of rows) {
+      if (seen[g].has(r.HAKSU_NO)) continue;
+      seen[g].add(r.HAKSU_NO);
+      campuses[g].push([r.HAKSU_NO, (r.SUBJECT_NM_KOR || '').replace(/\s+/g, ' ').trim(), r.PROFNM || '', r.ISU_NM || '', r.TIME || '', r.LOC_NM || '', r.CYBER_YN ? 1 : 0]);
+    }
+    return { year: t.year, term: t.term, fetchedAt: new Date().toISOString(), campuses };
+  }
+
+  const cacheGet = (id) => { try { const c = JSON.parse(localStorage.getItem('gc.live.' + id) || 'null'); return c && c.at && c.data ? c : null; } catch (e) { return null; } };
+  const cacheSet = (id, data) => {
+    const v = JSON.stringify({ at: Date.now(), data });
+    try { localStorage.setItem('gc.live.' + id, v); }
+    catch (e) { try { for (const k of Object.keys(localStorage)) if (k.startsWith('gc.live.')) localStorage.removeItem(k); localStorage.setItem('gc.live.' + id, v); } catch (e2) {} }
+  };
+
+  function setSource(t, src) {
+    lastSrc = src;
+    const d = new Date(src.at || Date.now()), today = new Date().toDateString() === d.toDateString();
+    const day = `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
+    const txt = src.kind === 'live' ? `학교 시간표 실시간 · ${today ? '오늘' : day} ${pad(d.getHours())}:${pad(d.getMinutes())} 확인`
+      : src.kind === 'checking' ? '학교 서버 확인 중…'
+      : `저장본 ${day} 기준${src.offline ? ' · 학교 서버에 연결하지 못했어요' : ''}`;
+    $('srcLine').innerHTML = `${esc(semLabel(t))} · <span class="${src.kind === 'live' ? 'src-live' : ''}">${esc(txt)}</span>`;
+  }
+
+  function applyData(t, data, src) { ROOMS = build(data); renderControls(); render(); setSource(t, src); }
+
+  async function loadSem(id) {
+    const seq = ++loadSeq;
+    const meta = SEMS.find((s) => s.id === id) || SEMS[0];
+    const t = { year: meta.year, term: meta.term };
+    S.room = null; S.mapBld = '';
+    let shown = null;
+    const cached = cacheGet(meta.id);
+    if (cached) { applyData(t, cached.data, { kind: 'live', at: cached.at }); shown = lastSrc; }
+    else if (meta.file) {
+      $('summary').innerHTML = '<span class="loading">시간표 불러오는 중…</span>';
+      try {
+        const d = await fetch(meta.file).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+        if (seq !== loadSeq) return;
+        applyData(t, d, { kind: 'snap', at: d.fetchedAt }); shown = lastSrc;
+      } catch (e) {}
+    }
+    if (cached && Date.now() - cached.at < LIVE_TTL) return;
+    if (!shown) { ROOMS = new Map(); renderControls(); render(); $('summary').innerHTML = '<span class="loading">학교 서버에서 시간표 받는 중…</span>'; }
+    setSource(t, { kind: 'checking' });
+    try {
+      const d = await liveFetch(t);
+      if (seq !== loadSeq) return;
+      if (scheduledCount(d) < MIN_SCHEDULED) {
+        if (shown) setSource(t, shown);
+        else { $('srcLine').textContent = `${semLabel(t)} · 아직 시간표 없음`; $('summary').innerHTML = `<span class="loading">학교에 ${esc(semLabel(t))} 시간표가 아직 올라오지 않았어요.</span>`; }
+        return;
+      }
+      cacheSet(meta.id, d);
+      applyData(t, d, { kind: 'live', at: Date.now() });
+    } catch (e) {
+      if (seq !== loadSeq) return;
+      if (shown) setSource(t, { ...shown, offline: shown.kind === 'snap' });
+      else { $('srcLine').textContent = `${semLabel(t)} · 학교 서버에 연결하지 못했어요`; $('summary').innerHTML = '<span class="err">학교 서버에 연결하지 못했어요. 잠시 후 새로고침해 주세요.</span>'; }
+    }
+  }
+
+  async function init() {
+    bind(); setNow(); renderControls();
+    const getJSON = (f) => fetch(f).then((r) => r.ok ? r.json() : null).catch(() => null);
+    const [idx, gG, gM] = await Promise.all([getJSON('data/index.json'), getJSON('data/map-global.json'), getJSON('data/map-medical.json')]);
+    if (gG) GEOS.G = gG;
+    if (gM) GEOS.M = gM;
+    const cur = termByDate(), nxt = nextTerm(cur);
+    const m = new Map();
+    for (const s of (idx && idx.semesters) || []) m.set(s.id, { id: s.id, year: +s.year, term: String(s.term), file: s.file });
+    for (const t of [cur, nxt]) if (!m.has(semKey(t))) m.set(semKey(t), { id: semKey(t), year: t.year, term: t.term, file: null });
+    SEMS = [...m.values()].sort((a, b) => b.id.localeCompare(a.id));
+    $('semSel').innerHTML = SEMS.map((s) => `<option value="${esc(s.id)}"${s.id === semKey(cur) ? ' selected' : ''}>${esc(semLabel(s))}${s.id === semKey(nxt) ? ' (다음 학기)' : ''}</option>`).join('');
+    $('semField').hidden = false;
+    await loadSem(semKey(cur));
+  }
+  init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+name: 시간표 갱신
+
+on:
+  schedule:
+    - cron: '17 21 * * *' # 매일 06:17 (한국 시간)
+  workflow_dispatch:
+    inputs:
+      terms:
+        description: '받을 학기 (예: 2027-10 2027-20). 비우면 지금 학기와 다음 학기'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: timetable
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 학교 시간표 받기
+        env:
+          TERMS: ${{ github.event.inputs.terms }}
+        run: node scripts/fetch-timetable.mjs $TERMS
+      - name: 바뀐 데이터 커밋
+        run: |
+          if [ -n "$(git status --porcelain data)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data
+            git commit -m "시간표 데이터 갱신 ($(TZ=Asia/Seoul date +%F))"
+            git push
+          else
+            echo "바뀐 데이터 없음"
+          fi
