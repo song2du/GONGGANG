@@ -9,8 +9,8 @@
 ## 시간표 데이터가 들어오는 방식
 
 1. **페이지를 열 때 실시간으로 받아요.** 학생 브라우저가 [가천대학교 시간표 및 강의계획서 조회](https://info.gachon.ac.kr/ssu/showTimetable.do)의 조회 API에 직접 요청해서 지금 학기 시간표를 받아요. 받은 데이터는 그 브라우저에 6시간 동안 보관해요.
-2. **매일 저장본을 갱신해요.** `.github/workflows/update-timetable.yml`이 매일 06:17(한국 시간)에 `scripts/fetch-timetable.mjs`를 실행해 지금 학기와 다음 학기 시간표를 `data/`에 저장해요. 데이터가 바뀌었을 때만 커밋해요. 학교 서버에 연결되지 않을 때 페이지가 이 저장본을 보여줘요.
-3. **학기는 날짜로 정해요.** 3~8월은 1학기, 9~2월은 2학기예요. 다음 학기 시간표가 학교에 올라오면 학기 선택에서 미리 볼 수 있어요.
+2. **매일 저장본을 갱신해요.** `.github/workflows/update-timetable.yml`이 매일 06:17(한국 시간)에 `scripts/fetch-timetable.mjs`를 실행해 지금 학기 시간표를 `data/`에 저장해요. 새 학기 데이터가 저장되면 지난 학기 데이터는 지워요. 데이터가 바뀌었을 때만 커밋해요. 학교 서버에 연결되지 않을 때 페이지가 이 저장본을 보여줘요.
+3. **학기는 날짜로 정해요.** 3~8월은 1학기, 9~2월은 2학기이고, 페이지는 항상 지금 학기만 보여줘요.
 
 특정 학기를 직접 받으려면 Actions 탭에서 "시간표 갱신"을 수동 실행하고 학기를 적어요(예: `2027-10`). 학기 코드는 10 = 1학기, 11 = 여름계절, 20 = 2학기, 21 = 겨울계절이에요.
 
@@ -33,7 +33,7 @@
 ## 직접 실행
 
 ```sh
-node scripts/fetch-timetable.mjs          # 지금 학기와 다음 학기
+node scripts/fetch-timetable.mjs          # 지금 학기
 node scripts/fetch-timetable.mjs 2027-10  # 특정 학기
 python3 -m http.server                    # http://localhost:8000 에서 확인
 ```

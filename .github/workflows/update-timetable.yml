@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       terms:
-        description: '받을 학기 (예: 2027-10 2027-20). 비우면 지금 학기와 다음 학기'
+        description: '받을 학기 (예: 2027-10). 비우면 지금 학기'
         required: false
         default: ''
 

@@ -309,7 +309,7 @@ button { cursor: pointer; }
     ko: {
       name: '한국어', title: '가천 빈 강의실',
       days: ['월', '화', '수', '목', '금', '토', '일'], daysFull: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
-      terms: { '10': '1학기', '11': '여름계절', '20': '2학기', '21': '겨울계절' }, sem: (y, t) => `${y}년 ${t}`, nextSem: ' (다음 학기)',
+      terms: { '10': '1학기', '11': '여름계절', '20': '2학기', '21': '겨울계절' }, sem: (y, t) => `${y}년 ${t}`,
       loadingSchool: '학교 시간표를 불러오는 중', campus: '캠퍼스', global: '글로벌캠퍼스', medical: '메디컬캠퍼스',
       theme: '화면 모드', themeSystem: '시스템 설정 따르기', themeLight: '라이트 모드', themeDark: '다크 모드', lang: '언어',
       filters: '찾기 조건', day: '요일', time: '시간', now: '지금', roomSearch: '강의실 시간표 보기', show: '보기', semester: '학기', loading: '시간표 불러오는 중…',
@@ -339,7 +339,7 @@ button { cursor: pointer; }
     en: {
       name: 'English', title: 'Gachon Empty Rooms',
       days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], daysFull: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-      terms: { '10': 'Spring', '11': 'Summer session', '20': 'Fall', '21': 'Winter session' }, sem: (y, t) => `${t} ${y}`, nextSem: ' (next)',
+      terms: { '10': 'Spring', '11': 'Summer session', '20': 'Fall', '21': 'Winter session' }, sem: (y, t) => `${t} ${y}`,
       loadingSchool: 'Loading the school timetable', campus: 'Campus', global: 'Global Campus', medical: 'Medical Campus',
       theme: 'Display mode', themeSystem: 'Match system setting', themeLight: 'Light mode', themeDark: 'Dark mode', lang: 'Language',
       filters: 'Search options', day: 'Day', time: 'Time', now: 'Now', roomSearch: 'Room timetable', show: 'View', semester: 'Semester', loading: 'Loading timetable…',
@@ -369,7 +369,7 @@ button { cursor: pointer; }
     ja: {
       name: '日本語', title: '嘉泉 空き教室',
       days: ['月', '火', '水', '木', '金', '土', '日'], daysFull: ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日'],
-      terms: { '10': '1学期', '11': '夏季学期', '20': '2学期', '21': '冬季学期' }, sem: (y, t) => `${y}年 ${t}`, nextSem: '（次学期）',
+      terms: { '10': '1学期', '11': '夏季学期', '20': '2学期', '21': '冬季学期' }, sem: (y, t) => `${y}年 ${t}`,
       loadingSchool: '学校の時間割を読み込み中', campus: 'キャンパス', global: 'グローバルキャンパス', medical: 'メディカルキャンパス',
       theme: '表示モード', themeSystem: 'システム設定に合わせる', themeLight: 'ライトモード', themeDark: 'ダークモード', lang: '言語',
       filters: '検索条件', day: '曜日', time: '時刻', now: '今', roomSearch: '教室の時間割', show: '表示', semester: '学期', loading: '時間割を読み込み中…',
@@ -399,7 +399,7 @@ button { cursor: pointer; }
     zh: {
       name: '中文', title: '嘉泉空教室',
       days: ['一', '二', '三', '四', '五', '六', '日'], daysFull: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
-      terms: { '10': '第1学期', '11': '夏季学期', '20': '第2学期', '21': '冬季学期' }, sem: (y, t) => `${y}年${t}`, nextSem: '（下学期）',
+      terms: { '10': '第1学期', '11': '夏季学期', '20': '第2学期', '21': '冬季学期' }, sem: (y, t) => `${y}年${t}`,
       loadingSchool: '正在加载学校课表', campus: '校区', global: '全球校区', medical: '医学校区',
       theme: '显示模式', themeSystem: '跟随系统设置', themeLight: '浅色模式', themeDark: '深色模式', lang: '语言',
       filters: '筛选条件', day: '星期', time: '时间', now: '现在', roomSearch: '查看教室课表', show: '查看', semester: '学期', loading: '正在加载课表…',
@@ -429,7 +429,7 @@ button { cursor: pointer; }
     vi: {
       name: 'Tiếng Việt', title: 'Phòng trống Gachon',
       days: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'], daysFull: ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật'],
-      terms: { '10': 'Học kỳ 1', '11': 'Học kỳ hè', '20': 'Học kỳ 2', '21': 'Học kỳ đông' }, sem: (y, t) => `${t} năm ${y}`, nextSem: ' (học kỳ tới)',
+      terms: { '10': 'Học kỳ 1', '11': 'Học kỳ hè', '20': 'Học kỳ 2', '21': 'Học kỳ đông' }, sem: (y, t) => `${t} năm ${y}`,
       loadingSchool: 'Đang tải thời khóa biểu của trường', campus: 'Cơ sở', global: 'Cơ sở Global', medical: 'Cơ sở Y khoa',
       theme: 'Chế độ hiển thị', themeSystem: 'Theo cài đặt hệ thống', themeLight: 'Chế độ sáng', themeDark: 'Chế độ tối', lang: 'Ngôn ngữ',
       filters: 'Điều kiện tìm', day: 'Thứ', time: 'Giờ', now: 'Bây giờ', roomSearch: 'Xem lịch phòng học', show: 'Xem', semester: 'Học kỳ', loading: 'Đang tải thời khóa biểu…',
@@ -459,7 +459,7 @@ button { cursor: pointer; }
     mn: {
       name: 'Монгол', title: 'Гачон сул анги',
       days: ['Да', 'Мя', 'Лх', 'Пү', 'Ба', 'Бя', 'Ня'], daysFull: ['Даваа', 'Мягмар', 'Лхагва', 'Пүрэв', 'Баасан', 'Бямба', 'Ням'],
-      terms: { '10': '1-р улирал', '11': 'зуны улирал', '20': '2-р улирал', '21': 'өвлийн улирал' }, sem: (y, t) => `${y} оны ${t}`, nextSem: ' (дараагийн улирал)',
+      terms: { '10': '1-р улирал', '11': 'зуны улирал', '20': '2-р улирал', '21': 'өвлийн улирал' }, sem: (y, t) => `${y} оны ${t}`,
       loadingSchool: 'Сургуулийн хуваарийг ачаалж байна', campus: 'Кампус', global: 'Глобал кампус', medical: 'Анагаахын кампус',
       theme: 'Дэлгэцийн горим', themeSystem: 'Системийн тохиргоог дагах', themeLight: 'Цайвар горим', themeDark: 'Бараан горим', lang: 'Хэл',
       filters: 'Хайлтын нөхцөл', day: 'Гараг', time: 'Цаг', now: 'Одоо', roomSearch: 'Ангийн хуваарь харах', show: 'Харах', semester: 'Улирал', loading: 'Хуваарь ачаалж байна…',
@@ -903,9 +903,8 @@ button { cursor: pointer; }
   const semKey = (t) => `${t.year}-${t.term}`;
   const semLabel = (t) => T().sem(t.year, T().terms[t.term] || t.term);
   const termByDate = () => { const d = new Date(Date.now() + 9 * 3600e3); const y = d.getUTCFullYear(), m = d.getUTCMonth() + 1; return m >= 3 && m <= 8 ? { year: y, term: '10' } : m >= 9 ? { year: y, term: '20' } : { year: y - 1, term: '20' }; };
-  const nextTerm = (t) => t.term === '10' ? { year: t.year, term: '20' } : { year: t.year + 1, term: '10' };
   const scheduledCount = (d) => Object.values(d.campuses).flat().filter((r) => r[4] && r[5]).length;
-  let SEMS = [], loadSeq = 0, lastSrc = null, lastT = null, SEM_NXT = '';
+  let SEMS = [], loadSeq = 0, lastSrc = null, lastT = null;
 
   async function liveFetch(t) {
     const jobs = [];
@@ -998,7 +997,7 @@ button { cursor: pointer; }
 
   function fillSemSel(sel) {
     const cur = sel || $('semSel').value;
-    $('semSel').innerHTML = SEMS.map((s) => `<option value="${esc(s.id)}"${s.id === cur ? ' selected' : ''}>${esc(semLabel(s))}${s.id === SEM_NXT ? T().nextSem : ''}</option>`).join('');
+    $('semSel').innerHTML = SEMS.map((s) => `<option value="${esc(s.id)}"${s.id === cur ? ' selected' : ''}>${esc(semLabel(s))}</option>`).join('');
   }
 
   function applyLang() {
@@ -1023,15 +1022,11 @@ button { cursor: pointer; }
     const [idx, gG, gM] = await Promise.all([getJSON('data/index.json'), getJSON('data/map-global.json'), getJSON('data/map-medical.json')]);
     if (gG) GEOS.G = gG;
     if (gM) GEOS.M = gM;
-    const cur = termByDate(), nxt = nextTerm(cur);
-    const m = new Map();
-    for (const s of (idx && idx.semesters) || []) m.set(s.id, { id: s.id, year: +s.year, term: String(s.term), file: s.file });
-    for (const t of [cur, nxt]) if (!m.has(semKey(t))) m.set(semKey(t), { id: semKey(t), year: t.year, term: t.term, file: null });
-    SEMS = [...m.values()].sort((a, b) => b.id.localeCompare(a.id));
-    SEM_NXT = semKey(nxt);
-    fillSemSel(semKey(cur));
-    $('semField').hidden = false;
-    await loadSem(semKey(cur));
+    const cur = termByDate(), id = semKey(cur);
+    const snap = ((idx && idx.semesters) || []).find((s) => s.id === id);
+    SEMS = [{ id, year: cur.year, term: cur.term, file: snap ? snap.file : null }];
+    fillSemSel(id);
+    await loadSem(id);
   }
   init();
 })();

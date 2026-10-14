@@ -2,9 +2,10 @@
 // 가천대학교 "시간표 및 강의계획서 조회"(info.gachon.ac.kr)에서 학기 시간표를 받아 data/ 에 저장한다.
 // GitHub Actions에서 매일 실행된다. 데이터가 바뀌었을 때만 파일을 다시 쓴다.
 // 사용법: node scripts/fetch-timetable.mjs [연도-학기코드 ...]   예) node scripts/fetch-timetable.mjs 2027-10
-//   학기코드: 10 = 1학기, 11 = 여름계절, 20 = 2학기, 21 = 겨울계절. 인자가 없으면 지금 학기와 다음 학기.
+//   학기코드: 10 = 1학기, 11 = 여름계절, 20 = 2학기, 21 = 겨울계절. 인자가 없으면 지금 학기만 받고,
+//   지금 학기 데이터가 저장돼 있으면 지난 학기 데이터는 지운다.
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, unlink } from 'node:fs/promises';
 
 const API = 'https://info.gachon.ac.kr/Ssu1000q/mainSearch.do';
 const GROUPS = ['20', '21']; // 20 글로벌캠퍼스, 21 메디컬캠퍼스
@@ -14,7 +15,6 @@ const DATA = new URL('../data/', import.meta.url);
 
 const kst = () => { const d = new Date(Date.now() + 9 * 3600e3); return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, day: d.getUTCDate(), iso: d.toISOString().slice(0, 10) }; };
 const termByDate = () => { const { y, m } = kst(); return m >= 3 && m <= 8 ? { year: y, term: '10' } : m >= 9 ? { year: y, term: '20' } : { year: y - 1, term: '20' }; };
-const nextTerm = (t) => (t.term === '10' ? { year: t.year, term: '20' } : { year: t.year + 1, term: '10' });
 const idOf = (t) => `${t.year}-${t.term}`;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -58,9 +58,10 @@ async function fetchTerm({ year, term }) {
 const scheduled = (campuses) => Object.values(campuses).flat().filter((r) => r[4] && r[5]).length;
 const readJSON = async (name, fallback) => { try { return JSON.parse(await readFile(new URL(name, DATA), 'utf8')); } catch { return fallback; } };
 
-const terms = process.argv.slice(2).length
+const manual = process.argv.slice(2).length > 0;
+const terms = manual
   ? process.argv.slice(2).map((s) => { const [year, term] = s.split('-'); return { year: +year, term }; })
-  : [termByDate(), nextTerm(termByDate())];
+  : [termByDate()];
 
 const index = await readJSON('index.json', { default: '', semesters: [] });
 let changed = false;
@@ -81,6 +82,13 @@ for (const t of terms) {
 
 index.semesters.sort((a, b) => b.id.localeCompare(a.id));
 const cur = idOf(termByDate());
+if (!manual && index.semesters.some((s) => s.id === cur)) {
+  for (const s of index.semesters.filter((s) => s.id !== cur)) {
+    await unlink(new URL(`${s.id}.json`, DATA)).catch(() => {});
+    console.log(`${s.id}: 지난 학기 데이터 삭제`);
+  }
+  index.semesters = index.semesters.filter((s) => s.id === cur);
+}
 index.default = index.semesters.some((s) => s.id === cur) ? cur : (index.semesters[0] || {}).id || '';
 await writeFile(new URL('index.json', DATA), JSON.stringify(index, null, 1) + '\n');
 
