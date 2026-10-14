@@ -92,9 +92,12 @@ if (!manual && index.semesters.some((s) => s.id === cur)) {
 index.default = index.semesters.some((s) => s.id === cur) ? cur : (index.semesters[0] || {}).id || '';
 await writeFile(new URL('index.json', DATA), JSON.stringify(index, null, 1) + '\n');
 
-// 공개 저장소의 예약 실행은 60일 동안 저장소 활동이 없으면 꺼지므로, 매달 1일에는 확인 기록을 남겨 커밋이 생기게 한다.
+// 확인 기록은 데이터가 바뀌었을 때와 지난 기록에서 28일이 지났을 때 남긴다.
+// 페이지는 이 기록이 35일 넘게 없으면 자동 갱신이 멈춘 것으로 보고 학교 서버에서 직접 받는다.
+// 공개 저장소의 예약 실행은 60일 동안 저장소 활동이 없으면 꺼지므로, 이 기록이 커밋을 만들어 실행을 유지하는 역할도 한다.
 const now = kst();
 const status = await readJSON('status.json', {});
-if (changed || now.day === 1 || !status.checkedAt) {
+const sinceCheck = status.checkedAt ? (Date.parse(now.iso) - Date.parse(status.checkedAt)) / 864e5 : Infinity;
+if (changed || !(sinceCheck < 28)) {
   await writeFile(new URL('status.json', DATA), JSON.stringify({ checkedAt: now.iso }, null, 1) + '\n');
 }

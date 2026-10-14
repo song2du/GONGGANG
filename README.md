@@ -12,8 +12,8 @@ Pick a day and a time, then tap a building on the campus map to see which Gachon
 
 ### Timetable data
 
-1. **Live on every visit.** The browser requests the current semester's timetable directly from Gachon University's [timetable and syllabus lookup](https://info.gachon.ac.kr/ssu/showTimetable.do) and keeps it in the browser for 6 hours.
-2. **Daily saved copy.** [`update-timetable.yml`](.github/workflows/update-timetable.yml) runs [`scripts/fetch-timetable.mjs`](scripts/fetch-timetable.mjs) every day at 06:17 KST and saves the current semester to `data/`. It commits only when the timetable changed. When a new semester is saved, the previous semester's file is deleted. The site falls back to this copy when the school server can't be reached.
+1. **Daily saved copy.** [`update-timetable.yml`](.github/workflows/update-timetable.yml) runs [`scripts/fetch-timetable.mjs`](scripts/fetch-timetable.mjs) every day at 06:17 KST. It compares the current semester with the university's [timetable and syllabus lookup](https://info.gachon.ac.kr/ssu/showTimetable.do) and commits `data/` only when something changed. The site shows this copy, so visiting it sends no requests to the school server. When a new semester is saved, the previous semester's file is deleted.
+2. **Live fallback.** If there is no saved copy for the current semester (for example, the morning a semester starts) or the copy hasn't been confirmed in 35 days (the daily job has stopped), the browser gets the timetable straight from the school server and keeps it for 6 hours.
 3. **Semester by date.** March–August is the spring semester (1학기) and September–February the fall semester (2학기). The site always shows the current one.
 
 To fetch a specific semester by hand, run the **시간표 갱신** workflow from the Actions tab and enter a term such as `2027-10`. Term codes: `10` spring, `11` summer session, `20` fall, `21` winter session.
@@ -38,7 +38,7 @@ Campus maps are drawn from [OpenStreetMap](https://www.openstreetmap.org/copyrig
 | `data/index.json` | List of saved semesters |
 | `data/YYYY-TT.json` | Timetable for one semester: course code, title, instructor, category, time, room, online flag |
 | `data/map-global.json`, `data/map-medical.json` | Campus maps |
-| `data/status.json` | Last check date (keeps the scheduled workflow active) |
+| `data/status.json` | Last check date, written when the data changes and at least every 28 days. Tells the site the saved copy is current and keeps the scheduled workflow active |
 | `scripts/fetch-timetable.mjs` | Fetches the timetable into `data/` (Node 20+) |
 | `.github/workflows/update-timetable.yml` | Daily update job |
 

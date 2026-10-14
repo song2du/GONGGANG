@@ -303,8 +303,10 @@ button { cursor: pointer; }
   const $ = (id) => document.getElementById(id);
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} }
   };
+  const getJSON = (f) => fetch(f).then((r) => r.ok ? r.json() : null).catch(() => null);
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const hhmm = (t) => { const h = Math.floor(t + 1e-9), m = Math.round((t - h) * 60); return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0'); };
   const byNo = (a, b) => a.no.localeCompare(b.no, 'ko', { numeric: true });
@@ -332,11 +334,11 @@ button { cursor: pointer; }
       lgRegular: '정규 수업', lgPart: '일부 기간 수업', lgMulti: '강의실 여러 곳', lgSel: '고른 시간',
       errEmpty: '강의실 이름을 입력하세요. 예: 가천관 612', errMany: (n) => `${n}곳이 맞아요. 건물 이름까지 입력해 보세요.`,
       errOther: '다른 캠퍼스 강의실이에요. 위에서 캠퍼스를 바꿔 보세요.', errNone: '이번 학기 수업이 있는 강의실 중에 찾지 못했어요.',
-      srcLive: (w, hm) => `학교 시간표 실시간 · ${w} ${hm} 확인`, today: '오늘', checking: '학교 서버 확인 중…', srcSnap: (d) => `저장본 ${d} 기준`, offline: ' · 학교 서버에 연결하지 못했어요',
+      srcLive: (w, hm) => `학교 시간표 실시간 · ${w} ${hm} 확인`, today: '오늘', checking: '학교 서버 확인 중…', srcDaily: (d) => `매일 자동 확인 · 마지막 변경 ${d}`, srcSnap: (d) => `저장본 ${d} 기준`, offline: ' · 학교 서버에 연결하지 못했어요',
       noYet: '아직 시간표 없음', notPosted: (s) => `학교에 ${s} 시간표가 아직 올라오지 않았어요.`, fetching: '학교 서버에서 시간표 받는 중…',
       failShort: '학교 서버에 연결하지 못했어요', failLong: '학교 서버에 연결하지 못했어요. 잠시 후 새로고침해 주세요.',
       notes: [
-        `출처: <a href="${SRC_URL}">가천대학교 시간표 및 강의계획서 조회</a>. 페이지를 열면 학교 서버에서 시간표를 바로 받아오고, 받은 시간표는 이 브라우저에 6시간 동안 보관해요. 학교 서버에 연결되지 않으면 매일 자동으로 갱신하는 저장본을 보여줘요. 학기는 날짜에 맞춰 자동으로 바뀌어요(3~8월 1학기, 9~2월 2학기). 학교와 관계없는 학생용 비공식 페이지예요.`,
+        `출처: <a href="${SRC_URL}">가천대학교 시간표 및 강의계획서 조회</a>. 매일 아침 학교 시간표를 확인해서 바뀐 내용이 있으면 저장본을 갱신하고, 페이지는 이 저장본을 보여줘요. 새 학기 첫날처럼 최근 저장본이 없을 때만 학교 서버에서 바로 받아와요. 학기는 날짜에 맞춰 자동으로 바뀌어요(3~8월 1학기, 9~2월 2학기). 학교와 관계없는 학생용 비공식 페이지예요.`,
         `지도: <a href="${OSM_URL}">© OpenStreetMap 기여자</a>의 건물·길 데이터로 그렸어요. 메디컬캠퍼스 건물 이름은 카카오맵·네이버 지도 표시와 건물 주소로 확인했어요(의과학대학은 지도에 옛 이름 보건과학대학으로 나와요). 바이오나노대학은 위치를 확인하지 못해서 지도 옆 건물 목록에만 나와요.`,
         '교시는 1교시 09:00부터 교시당 1시간으로 계산했어요.',
         '시간표에 있는 정규 수업만 반영해요. 보강, 시험, 행사, 스터디룸 예약, 문 잠김은 알 수 없어요.',
@@ -362,11 +364,11 @@ button { cursor: pointer; }
       lgRegular: 'Regular class', lgPart: 'Part-term class', lgMulti: 'Multiple rooms', lgSel: 'Selected time',
       errEmpty: 'Enter a room, e.g. 가천관 612', errMany: (n) => `${n} rooms match. Add the building name too.`,
       errOther: 'That room is on the other campus. Switch campus above.', errNone: 'No room with classes this semester matches.',
-      srcLive: (w, hm) => `Live from the school · checked ${w} ${hm}`, today: 'today', checking: 'Checking the school server…', srcSnap: (d) => `Saved copy from ${d}`, offline: " · couldn't reach the school server",
+      srcLive: (w, hm) => `Live from the school · checked ${w} ${hm}`, today: 'today', checking: 'Checking the school server…', srcDaily: (d) => `Checked daily · last changed ${d}`, srcSnap: (d) => `Saved copy from ${d}`, offline: " · couldn't reach the school server",
       noYet: 'No timetable yet', notPosted: (s) => `The ${s} timetable isn't posted yet.`, fetching: 'Getting the timetable from the school…',
       failShort: "Couldn't reach the school server", failLong: "Couldn't reach the school server. Try reloading in a moment.",
       notes: [
-        `Source: <a href="${SRC_URL}">Gachon University timetable and syllabus lookup</a> (Korean). When you open the page it gets the timetable straight from the school server and keeps it in this browser for 6 hours. If the school server can't be reached, it shows a saved copy that updates automatically every day. The semester switches by date (March–August: spring, September–February: fall). This is an unofficial page made by students, not run by the university.`,
+        `Source: <a href="${SRC_URL}">Gachon University timetable and syllabus lookup</a> (Korean). Every morning the timetable is checked against the school's, and the saved copy is updated when anything changed. The page shows that copy. Only when there is no recent copy, such as on the first day of a semester, does it get the timetable straight from the school server. The semester switches by date (March–August: spring, September–February: fall). This is an unofficial page made by students, not run by the university.`,
         `Map: drawn from building and path data by <a href="${OSM_URL}">© OpenStreetMap contributors</a>. Medical Campus building names were checked against KakaoMap, Naver Map and building addresses (의과학대학 appears on maps under its old name, 보건과학대학). The location of 바이오나노대학 couldn't be confirmed, so it appears only in the building list beside the map.`,
         'Period 1 starts at 09:00 and each period counts as one hour.',
         "Only regular classes in the timetable are included. Make-up classes, exams, events, study-room bookings and locked doors aren't known.",
@@ -392,11 +394,11 @@ button { cursor: pointer; }
       lgRegular: '通常の授業', lgPart: '一部期間の授業', lgMulti: '複数教室', lgSel: '選んだ時刻',
       errEmpty: '教室名を入力してください。例：가천관 612', errMany: (n) => `${n}件該当します。建物名も入力してください。`,
       errOther: '別のキャンパスの教室です。上でキャンパスを切り替えてください。', errNone: '今学期に授業のある教室の中に見つかりませんでした。',
-      srcLive: (w, hm) => `学校の時間割（リアルタイム）· ${w} ${hm} 確認`, today: '今日', checking: '学校のサーバーを確認中…', srcSnap: (d) => `${d}時点の保存データ`, offline: ' · 学校のサーバーに接続できませんでした',
+      srcLive: (w, hm) => `学校の時間割（リアルタイム）· ${w} ${hm} 確認`, today: '今日', checking: '学校のサーバーを確認中…', srcDaily: (d) => `毎日自動で確認 · 最終変更 ${d}`, srcSnap: (d) => `${d}時点の保存データ`, offline: ' · 学校のサーバーに接続できませんでした',
       noYet: '時間割未公開', notPosted: (s) => `${s}の時間割はまだ公開されていません。`, fetching: '学校から時間割を取得中…',
       failShort: '学校のサーバーに接続できませんでした', failLong: '学校のサーバーに接続できませんでした。しばらくしてから再読み込みしてください。',
       notes: [
-        `出典：<a href="${SRC_URL}">嘉泉大学 時間割・シラバス照会</a>（韓国語）。ページを開くと学校のサーバーから時間割を直接取得し、このブラウザに6時間保存します。学校のサーバーにつながらない場合は、毎日自動で更新される保存データを表示します。学期は日付に合わせて自動で切り替わります（3〜8月は1学期、9〜2月は2学期）。大学とは関係のない、学生が作った非公式のページです。`,
+        `出典：<a href="${SRC_URL}">嘉泉大学 時間割・シラバス照会</a>（韓国語）。毎朝学校の時間割を確認し、変更があれば保存データを更新します。ページはこの保存データを表示します。学期の初日など、最近の保存データがないときだけ学校のサーバーから直接取得します。学期は日付に合わせて自動で切り替わります（3〜8月は1学期、9〜2月は2学期）。大学とは関係のない、学生が作った非公式のページです。`,
         `地図：<a href="${OSM_URL}">© OpenStreetMap 貢献者</a>の建物・道のデータで描いています。メディカルキャンパスの建物名はカカオマップ・NAVER地図の表示と建物の住所で確認しました（의과학대학は地図上で旧名の보건과학대학と表示されます）。바이오나노대학は位置を確認できなかったため、地図横の建物一覧にだけ表示されます。`,
         '時限は1限を09:00とし、1時限を1時間として計算しています。',
         '時間割にある通常の授業だけを反映しています。補講、試験、行事、自習室の予約、施錠の有無はわかりません。',
@@ -422,11 +424,11 @@ button { cursor: pointer; }
       lgRegular: '常规课程', lgPart: '部分周期课程', lgMulti: '多个教室', lgSel: '所选时间',
       errEmpty: '请输入教室，例如：가천관 612', errMany: (n) => `有 ${n} 间教室匹配，请同时输入建筑名称。`,
       errOther: '该教室在另一个校区，请在上方切换校区。', errNone: '在本学期有课的教室中未找到。',
-      srcLive: (w, hm) => `学校课表实时 · ${w} ${hm} 已确认`, today: '今天', checking: '正在确认学校服务器…', srcSnap: (d) => `${d} 保存版`, offline: ' · 无法连接学校服务器',
+      srcLive: (w, hm) => `学校课表实时 · ${w} ${hm} 已确认`, today: '今天', checking: '正在确认学校服务器…', srcDaily: (d) => `每日自动检查 · 最后变更 ${d}`, srcSnap: (d) => `${d} 保存版`, offline: ' · 无法连接学校服务器',
       noYet: '暂无课表', notPosted: (s) => `学校尚未发布${s}课表。`, fetching: '正在从学校获取课表…',
       failShort: '无法连接学校服务器', failLong: '无法连接学校服务器，请稍后刷新。',
       notes: [
-        `来源：<a href="${SRC_URL}">嘉泉大学课表及教学大纲查询</a>（韩语）。打开页面时会直接从学校服务器获取课表，并在本浏览器中保存6小时。无法连接学校服务器时，会显示每天自动更新的保存版。学期按日期自动切换（3–8月为第1学期，9–2月为第2学期）。本页面是学生制作的非官方页面，与学校无关。`,
+        `来源：<a href="${SRC_URL}">嘉泉大学课表及教学大纲查询</a>（韩语）。每天早上会与学校课表核对，有变化时更新保存版，页面显示的就是这个保存版。只有在没有近期保存版时（例如新学期第一天），才会直接从学校服务器获取课表。学期按日期自动切换（3–8月为第1学期，9–2月为第2学期）。本页面是学生制作的非官方页面，与学校无关。`,
         `地图：根据 <a href="${OSM_URL}">© OpenStreetMap 贡献者</a> 的建筑和道路数据绘制。医学校区的建筑名称已对照 Kakao地图、Naver地图的标注及建筑地址核实（의과학대학 在地图上显示为旧名 보건과학대학）。바이오나노대학 的位置无法确认，因此只显示在地图旁的建筑列表中。`,
         '第1节从09:00开始，每节按1小时计算。',
         '只包含课表中的常规课程。补课、考试、活动、自习室预约以及教室是否上锁无法得知。',
@@ -452,11 +454,11 @@ button { cursor: pointer; }
       lgRegular: 'Lớp thường', lgPart: 'Lớp học một phần học kỳ', lgMulti: 'Nhiều phòng', lgSel: 'Giờ đã chọn',
       errEmpty: 'Hãy nhập tên phòng, ví dụ: 가천관 612', errMany: (n) => `Có ${n} phòng khớp. Hãy nhập thêm tên tòa nhà.`,
       errOther: 'Phòng này ở cơ sở khác. Hãy đổi cơ sở ở phía trên.', errNone: 'Không tìm thấy trong các phòng có lớp ở học kỳ này.',
-      srcLive: (w, hm) => `Dữ liệu trực tiếp từ trường · kiểm tra ${w} lúc ${hm}`, today: 'hôm nay', checking: 'Đang kiểm tra máy chủ của trường…', srcSnap: (d) => `Bản lưu ngày ${d}`, offline: ' · không kết nối được máy chủ của trường',
+      srcLive: (w, hm) => `Dữ liệu trực tiếp từ trường · kiểm tra ${w} lúc ${hm}`, today: 'hôm nay', checking: 'Đang kiểm tra máy chủ của trường…', srcDaily: (d) => `Kiểm tra tự động hằng ngày · thay đổi lần cuối ${d}`, srcSnap: (d) => `Bản lưu ngày ${d}`, offline: ' · không kết nối được máy chủ của trường',
       noYet: 'Chưa có thời khóa biểu', notPosted: (s) => `Trường chưa đăng thời khóa biểu ${s}.`, fetching: 'Đang lấy thời khóa biểu từ trường…',
       failShort: 'Không kết nối được máy chủ của trường', failLong: 'Không kết nối được máy chủ của trường. Hãy tải lại trang sau ít phút.',
       notes: [
-        `Nguồn: <a href="${SRC_URL}">Tra cứu thời khóa biểu và đề cương môn học của Đại học Gachon</a> (tiếng Hàn). Khi mở trang, thời khóa biểu được lấy trực tiếp từ máy chủ của trường và được lưu trong trình duyệt này 6 giờ. Nếu không kết nối được máy chủ của trường, trang sẽ hiển thị bản lưu được cập nhật tự động mỗi ngày. Học kỳ tự đổi theo ngày (tháng 3–8: học kỳ 1, tháng 9–2: học kỳ 2). Đây là trang không chính thức do sinh viên làm, không thuộc nhà trường.`,
+        `Nguồn: <a href="${SRC_URL}">Tra cứu thời khóa biểu và đề cương môn học của Đại học Gachon</a> (tiếng Hàn). Mỗi sáng, thời khóa biểu được đối chiếu với dữ liệu của trường và bản lưu được cập nhật khi có thay đổi; trang hiển thị bản lưu này. Chỉ khi chưa có bản lưu gần đây, chẳng hạn ngày đầu học kỳ, trang mới lấy thời khóa biểu trực tiếp từ máy chủ của trường. Học kỳ tự đổi theo ngày (tháng 3–8: học kỳ 1, tháng 9–2: học kỳ 2). Đây là trang không chính thức do sinh viên làm, không thuộc nhà trường.`,
         `Bản đồ: vẽ từ dữ liệu tòa nhà và đường đi của <a href="${OSM_URL}">© những người đóng góp OpenStreetMap</a>. Tên tòa nhà ở Cơ sở Y khoa được đối chiếu với KakaoMap, Naver Map và địa chỉ tòa nhà (의과학대학 hiện trên bản đồ với tên cũ 보건과학대학). Chưa xác định được vị trí của 바이오나노대학 nên tòa nhà này chỉ có trong danh sách bên cạnh bản đồ.`,
         'Tiết 1 bắt đầu lúc 09:00, mỗi tiết tính là 1 giờ.',
         'Chỉ tính các lớp chính quy trong thời khóa biểu. Không biết được lớp học bù, thi, sự kiện, đặt phòng tự học hay phòng có khóa cửa không.',
@@ -482,11 +484,11 @@ button { cursor: pointer; }
       lgRegular: 'Тогтмол хичээл', lgPart: 'Улирлын хэсэгт ордог хичээл', lgMulti: 'Олон анги', lgSel: 'Сонгосон цаг',
       errEmpty: 'Ангийн нэрээ оруулна уу. Жишээ: 가천관 612', errMany: (n) => `${n} анги таарч байна. Барилгын нэрийг нэмж оруулна уу.`,
       errOther: 'Энэ анги нөгөө кампуст байна. Дээрээс кампусаа солино уу.', errNone: 'Энэ улиралд хичээлтэй ангиудаас олдсонгүй.',
-      srcLive: (w, hm) => `Сургуулийн хуваарь шууд · ${w} ${hm}-д шалгасан`, today: 'өнөөдөр', checking: 'Сургуулийн серверийг шалгаж байна…', srcSnap: (d) => `${d}-ны хадгалсан хувилбар`, offline: ' · сургуулийн серверт холбогдож чадсангүй',
+      srcLive: (w, hm) => `Сургуулийн хуваарь шууд · ${w} ${hm}-д шалгасан`, today: 'өнөөдөр', checking: 'Сургуулийн серверийг шалгаж байна…', srcDaily: (d) => `Өдөр бүр автоматаар шалгадаг · сүүлд өөрчлөгдсөн ${d}`, srcSnap: (d) => `${d}-ны хадгалсан хувилбар`, offline: ' · сургуулийн серверт холбогдож чадсангүй',
       noYet: 'Хуваарь хараахан гараагүй', notPosted: (s) => `${s}-ын хуваарь хараахан гараагүй байна.`, fetching: 'Сургуулиас хуваарь татаж байна…',
       failShort: 'Сургуулийн серверт холбогдож чадсангүй', failLong: 'Сургуулийн серверт холбогдож чадсангүй. Хэсэг хугацааны дараа дахин ачаална уу.',
       notes: [
-        `Эх сурвалж: <a href="${SRC_URL}">Гачон их сургуулийн хичээлийн хуваарь, хөтөлбөрийн хайлт</a> (солонгос хэлээр). Хуудсыг нээхэд сургуулийн серверээс хуваарийг шууд татаж, энэ хөтөчид 6 цаг хадгална. Сургуулийн серверт холбогдохгүй бол өдөр бүр автоматаар шинэчлэгддэг хадгалсан хувилбарыг харуулна. Улирал огноогоор автоматаар солигдоно (3–8 сар: 1-р улирал, 9–2 сар: 2-р улирал). Энэ нь сургуультай холбоогүй, оюутнуудын хийсэн албан бус хуудас юм.`,
+        `Эх сурвалж: <a href="${SRC_URL}">Гачон их сургуулийн хичээлийн хуваарь, хөтөлбөрийн хайлт</a> (солонгос хэлээр). Өглөө бүр сургуулийн хуваарьтай тулгаж, өөрчлөлт гарвал хадгалсан хувилбарыг шинэчилнэ. Хуудас энэ хадгалсан хувилбарыг харуулна. Шинэ улирлын эхний өдөр гэх мэт саяхны хадгалсан хувилбар байхгүй үед л сургуулийн серверээс шууд татна. Улирал огноогоор автоматаар солигдоно (3–8 сар: 1-р улирал, 9–2 сар: 2-р улирал). Энэ нь сургуультай холбоогүй, оюутнуудын хийсэн албан бус хуудас юм.`,
         `Газрын зураг: <a href="${OSM_URL}">© OpenStreetMap хувь нэмэр оруулагчид</a>-ын барилга, замын мэдээллээр зурсан. Анагаахын кампусын барилгын нэрийг KakaoMap, Naver Map болон барилгын хаягаар шалгасан (의과학대학 газрын зураг дээр хуучин нэр болох 보건과학대학 гэж харагдана). 바이오나노대학-ын байршлыг баталж чадаагүй тул зөвхөн газрын зургийн хажуугийн жагсаалтад гарна.`,
         '1-р цаг 09:00-д эхэлж, цаг бүрийг 1 цагаар тооцсон.',
         'Хуваарьт байгаа тогтмол хичээлүүдийг л тусгасан. Нөхөх хичээл, шалгалт, арга хэмжээ, бие даан суралцах өрөөний захиалга, хаалга түгжээтэй эсэхийг мэдэх боломжгүй.',
@@ -906,7 +908,9 @@ button { cursor: pointer; }
   /* ---------- semesters: saved copy first, then live from the school's timetable service ---------- */
   const API = 'https://info.gachon.ac.kr/Ssu1000q/mainSearch.do';
   const GROUPS = ['20', '21'], ISU = ['002', '001', '004', '003', '005', '006'];
-  const LIVE_TTL = 6 * 3600e3, MIN_SCHEDULED = 50;
+  // 저장본은 바뀔 때와 28일마다 확인 날짜가 기록된다. 그보다 오래 기록이 없으면 자동 갱신이 멈춘 것으로 본다.
+  const LIVE_TTL = 6 * 3600e3, SNAP_STALE = 35 * 864e5, MIN_SCHEDULED = 50;
+  let CHECKED_AT = 0;
   const pad = (n) => String(n).padStart(2, '0');
   const semKey = (t) => `${t.year}-${t.term}`;
   const semLabel = (t) => T().sem(t.year, T().terms[t.term] || t.term);
@@ -960,9 +964,10 @@ button { cursor: pointer; }
     const d = new Date(src.at || Date.now()), today = new Date().toDateString() === d.toDateString();
     const day = `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
     const txt = src.kind === 'live' ? T().srcLive(today ? T().today : day, `${pad(d.getHours())}:${pad(d.getMinutes())}`)
+      : src.kind === 'daily' ? T().srcDaily(day)
       : src.kind === 'checking' ? T().checking
       : T().srcSnap(day) + (src.offline ? T().offline : '');
-    $('srcLine').innerHTML = `${esc(semLabel(t))} · <span class="${src.kind === 'live' ? 'src-live' : ''}">${esc(txt)}</span>`;
+    $('srcLine').innerHTML = `${esc(semLabel(t))} · <span class="${src.kind === 'live' || src.kind === 'daily' ? 'src-live' : ''}">${esc(txt)}</span>`;
   }
 
   function applyData(t, data, src) { ROOMS = build(data); renderControls(); render(); setSource(t, src); }
@@ -972,17 +977,25 @@ button { cursor: pointer; }
     const meta = SEMS.find((s) => s.id === id) || SEMS[0];
     const t = { year: meta.year, term: meta.term };
     S.room = null; S.mapBld = '';
+    // 저장본은 매일 아침 학교 시간표와 대조해서 바뀐 경우에만 갱신된다.
+    // 최근에 확인된 저장본이 있으면 그것만 보여주고 학교 서버에는 요청하지 않는다.
+    let snap = null;
+    if (meta.file) {
+      $('summary').innerHTML = `<span class="loading">${T().loading}</span>`;
+      snap = await getJSON(meta.file);
+      if (seq !== loadSeq) return;
+      if (!snap || !snap.campuses) snap = null;
+    }
+    if (snap && Date.now() - Math.max(Date.parse(snap.fetchedAt) || 0, CHECKED_AT) < SNAP_STALE) {
+      store.del('gc.live.' + meta.id);
+      applyData(t, snap, { kind: 'daily', at: snap.fetchedAt });
+      return;
+    }
+    // 저장본이 없거나(새 학기 첫날 아침 등) 오래 갱신되지 않았을 때만 학교 서버에서 바로 받는다.
     let shown = null;
     const cached = cacheGet(meta.id);
-    if (cached) { applyData(t, cached.data, { kind: 'live', at: cached.at }); shown = lastSrc; }
-    else if (meta.file) {
-      $('summary').innerHTML = `<span class="loading">${T().loading}</span>`;
-      try {
-        const d = await fetch(meta.file).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
-        if (seq !== loadSeq) return;
-        applyData(t, d, { kind: 'snap', at: d.fetchedAt }); shown = lastSrc;
-      } catch (e) {}
-    }
+    if (cached && (!snap || cached.at > Date.parse(snap.fetchedAt))) { applyData(t, cached.data, { kind: 'live', at: cached.at }); shown = lastSrc; }
+    else if (snap) { applyData(t, snap, { kind: 'snap', at: snap.fetchedAt }); shown = lastSrc; }
     if (cached && Date.now() - cached.at < LIVE_TTL) return;
     if (!shown) { ROOMS = new Map(); renderControls(); render(); $('summary').innerHTML = `<span class="loading">${T().fetching}</span>`; }
     setSource(t, { kind: 'checking' });
@@ -1026,8 +1039,8 @@ button { cursor: pointer; }
       if (lastT && lastSrc) setSource(lastT, lastSrc);
     };
     bind(); setNow(); renderControls();
-    const getJSON = (f) => fetch(f).then((r) => r.ok ? r.json() : null).catch(() => null);
-    const [idx, gG, gM] = await Promise.all([getJSON('data/index.json'), getJSON('data/map-global.json'), getJSON('data/map-medical.json')]);
+    const [idx, st, gG, gM] = await Promise.all([getJSON('data/index.json'), getJSON('data/status.json'), getJSON('data/map-global.json'), getJSON('data/map-medical.json')]);
+    if (st && st.checkedAt) CHECKED_AT = Date.parse(st.checkedAt + 'T00:00:00+09:00') || 0;
     if (gG) GEOS.G = gG;
     if (gM) GEOS.M = gM;
     const cur = termByDate(), id = semKey(cur);
