@@ -126,10 +126,9 @@ button { cursor: pointer; }
 .m-campus { fill: var(--campus); }
 .m-field { fill: var(--field); stroke: var(--card); stroke-width: 1.5; }
 .offsite { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--rule); }
-.offsite button { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; gap: 10px; flex: 1 1 260px; border: 1px dashed var(--rule); background: var(--paper); border-radius: 8px; padding: 8px 12px; text-align: left; }
+.offsite button { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 10px; flex: 1 1 260px; border: 1px dashed var(--rule); background: var(--paper); border-radius: 8px; padding: 8px 12px; text-align: left; }
 .offsite button:hover, .offsite button[aria-pressed="true"] { border-color: var(--accent); border-style: solid; }
 .offsite .nm { font-weight: 600; }
-.offsite .wh { font-size: 12px; color: var(--ink-3); min-width: 0; }
 .offsite .ct { font-family: var(--mono); font-weight: 600; color: var(--free); }
 .m-major { fill: none; stroke: var(--road-major); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
 .m-road { fill: none; stroke: var(--road); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
@@ -277,7 +276,7 @@ button { cursor: pointer; }
   <footer class="notes">
     <ul>
       <li>출처: <a href="https://info.gachon.ac.kr/ssu/showTimetable.do">가천대학교 시간표 및 강의계획서 조회</a>. 페이지를 열면 학교 서버에서 시간표를 바로 받아오고, 받은 시간표는 이 브라우저에 6시간 동안 보관해요. 학교 서버에 연결되지 않으면 매일 자동으로 갱신하는 저장본을 보여줘요. 학기는 날짜에 맞춰 자동으로 바뀌어요(3~8월 1학기, 9~2월 2학기). 학교와 관계없는 학생용 비공식 페이지예요.</li>
-      <li>지도: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap 기여자</a>의 건물·길 데이터로 그렸어요. 메디컬캠퍼스 건물 이름은 카카오맵·네이버 지도 표시와 건물 주소로 확인했어요(의과학대학은 지도에 옛 이름 보건과학대학으로 나와요). 의과대학은 메디컬캠퍼스가 아니라 남동구 구월동 가천대길병원 옆에 있어서 지도 아래에 따로 표시해요. 바이오나노대학은 위치를 확인하지 못해서 지도 옆 건물 목록에만 나와요.</li>
+      <li>지도: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap 기여자</a>의 건물·길 데이터로 그렸어요. 메디컬캠퍼스 건물 이름은 카카오맵·네이버 지도 표시와 건물 주소로 확인했어요(의과학대학은 지도에 옛 이름 보건과학대학으로 나와요). 바이오나노대학은 위치를 확인하지 못해서 지도 옆 건물 목록에만 나와요.</li>
       <li>교시는 1교시 09:00부터 교시당 1시간으로 계산했어요.</li>
       <li>시간표에 있는 정규 수업만 반영해요. 보강, 시험, 행사, 스터디룸 예약, 문 잠김은 알 수 없어요.</li>
       <li>이번 학기 수업이 하나도 없는 강의실은 목록에 나오지 않아요.</li>
@@ -464,7 +463,7 @@ button { cursor: pointer; }
   function offsiteHTML(G, GEO) {
     const list = (GEO.offsite || []).map((o) => ({ o, e: G.get(o.name) })).filter((x) => x.e);
     if (!list.length) return '';
-    return `<div class="offsite">${list.map(({ o, e }) => `<button type="button" data-mb="${esc(e.key)}" aria-pressed="${S.mapBld === e.key}"><span class="nm">${esc(o.name)}</span><span class="wh">${esc(o.where)} · 지도 밖</span><span class="ct">${e.free}</span></button>`).join('')}</div>`;
+    return `<div class="offsite">${list.map(({ o, e }) => `<button type="button" data-mb="${esc(e.key)}" aria-pressed="${S.mapBld === e.key}"><span class="nm">${esc(o.name)}</span><span class="ct">${e.free}</span></button>`).join('')}</div>`;
   }
 
   function drawOverlay(G) {
@@ -533,7 +532,7 @@ button { cursor: pointer; }
     if (!e) {
       const onMap = new Set(GEO ? GEO.buildings.map((b) => b.name) : []);
       const off = new Map(((GEO && GEO.offsite) || []).map((o) => [o.name, o]));
-      const tag = (k) => !GEO || onMap.has(k) ? '' : off.has(k) ? '<small>길병원 옆</small>' : '<small>지도 위치 없음</small>';
+      const tag = (k) => !GEO || onMap.has(k) ? '' : off.has(k) ? '' : '<small>지도 위치 없음</small>';
       const list = [...G.values()].sort((a, b) => ko(displayName(a), displayName(b)));
       el.innerHTML = `<div class="mp-h"><div><h2>건물</h2><p>${GEO ? '지도에서 건물이나 숫자를 눌러도 돼요.' : '카드를 누르면 빈 강의실이 나와요.'}</p></div></div>
         <div class="rank">${list.map((x) => `<button type="button" data-mb="${esc(x.key)}"><span class="nm">${esc(displayName(x))}${tag(x.key)}</span><span class="f">${x.free}</span><span class="m">${x.maybe ? '+' + x.maybe : ''}</span></button>`).join('')}</div>
@@ -548,7 +547,6 @@ button { cursor: pointer; }
       : `<a href="https://map.kakao.com/?q=${encodeURIComponent(q)}">카카오맵</a><a href="https://map.naver.com/p/search/${encodeURIComponent(q)}">네이버 지도</a><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}">구글 지도</a>`;
     const plates = platesHTML(e.list);
     el.innerHTML = `<div class="mp-h"><div><h2>${esc(displayName(e))}</h2><p>빈 강의실 ${e.free} · 확인 필요 ${e.maybe} · 전체 ${e.total}</p></div><button type="button" class="ghost" id="panelBack">건물 목록</button></div>
-      ${offsite ? `<p class="note">메디컬캠퍼스가 아니라 ${esc(offsite.where)}에 있어요.</p>` : ''}
       <div class="links">${links}</div>
       ${plates ? `<div class="plates">${plates}</div>` : `<div class="empty">이 시간에는 모든 강의실에 수업이 있어요.</div>`}`;
     $('panelBack').onclick = () => { S.mapBld = ''; render(); };
