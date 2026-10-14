@@ -3,8 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>가천 빈 강의실</title>
-<meta name="description" content="가천대학교 공식 시간표로 요일·시간을 고르고 캠퍼스 지도에서 빈 강의실과 강의실별 시간표를 찾는 페이지">
+<title>어디가지?</title>
+<meta name="description" content="공강 시간에 갈 곳 없는 사람들을 위한 웹사이트. 가천대학교 공식 시간표로 지금 비어 있는 강의실을 캠퍼스 지도에서 찾아요.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="어디가지?">
+<meta property="og:description" content="공강 시간에 갈 곳 없는 사람들을 위한 웹사이트. 가천대 빈 강의실을 지도에서 바로 찾아요.">
+<meta property="og:url" content="https://song2du.github.io/GONGGANG/">
+<meta property="og:locale" content="ko_KR">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='3' width='24' height='26' rx='3' fill='%231D4E9E'/%3E%3Crect x='9' y='8' width='14' height='5' rx='1' fill='%23fff'/%3E%3Ccircle cx='21' cy='19' r='2' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,6 +70,8 @@ html { -webkit-text-size-adjust: 100%; }
 [hidden] { display: none !important; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
 .src-live { color: var(--free); }
+.brand .tagline { font-size: 15px; color: var(--ink-2); }
+.brand #srcLine { margin-top: 6px; font-size: 12.5px; color: var(--ink-3); }
 .tr { display: block; font-size: 12px; font-weight: 400; color: var(--ink-3); line-height: 1.35; letter-spacing: 0; }
 .mp-h h2 .tr { font-size: 13px; margin-top: 2px; }
 .m-lbl.sub { font-weight: 500; fill: var(--ink-2); }
@@ -229,7 +236,8 @@ button { cursor: pointer; }
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1 data-i18n="title">가천 빈 강의실</h1>
+      <h1 data-i18n="title">어디가지?</h1>
+      <p class="tagline" data-i18n="tagline">공강 시간에 갈 곳 없는 사람들을 위한 웹사이트</p>
       <p id="srcLine" data-i18n="loadingSchool">학교 시간표를 불러오는 중</p>
     </div>
     <div class="hdr-ctl">
@@ -307,7 +315,7 @@ button { cursor: pointer; }
   const SRC_URL = 'https://info.gachon.ac.kr/ssu/showTimetable.do', OSM_URL = 'https://www.openstreetmap.org/copyright';
   const I18N = {
     ko: {
-      name: '한국어', title: '가천 빈 강의실',
+      name: '한국어', title: '어디가지?', tagline: '공강 시간에 갈 곳 없는 사람들을 위한 웹사이트',
       days: ['월', '화', '수', '목', '금', '토', '일'], daysFull: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
       terms: { '10': '1학기', '11': '여름계절', '20': '2학기', '21': '겨울계절' }, sem: (y, t) => `${y}년 ${t}`,
       loadingSchool: '학교 시간표를 불러오는 중', campus: '캠퍼스', global: '글로벌캠퍼스', medical: '메디컬캠퍼스',
@@ -337,7 +345,7 @@ button { cursor: pointer; }
       ]
     },
     en: {
-      name: 'English', title: 'Gachon Empty Rooms',
+      name: 'English', title: 'Where to go?', tagline: 'For people with nowhere to go between classes',
       days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], daysFull: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
       terms: { '10': 'Spring', '11': 'Summer session', '20': 'Fall', '21': 'Winter session' }, sem: (y, t) => `${t} ${y}`,
       loadingSchool: 'Loading the school timetable', campus: 'Campus', global: 'Global Campus', medical: 'Medical Campus',
@@ -367,7 +375,7 @@ button { cursor: pointer; }
       ]
     },
     ja: {
-      name: '日本語', title: '嘉泉 空き教室',
+      name: '日本語', title: 'どこ行こう？', tagline: '空きコマに行き場のない人のためのサイト',
       days: ['月', '火', '水', '木', '金', '土', '日'], daysFull: ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日'],
       terms: { '10': '1学期', '11': '夏季学期', '20': '2学期', '21': '冬季学期' }, sem: (y, t) => `${y}年 ${t}`,
       loadingSchool: '学校の時間割を読み込み中', campus: 'キャンパス', global: 'グローバルキャンパス', medical: 'メディカルキャンパス',
@@ -397,7 +405,7 @@ button { cursor: pointer; }
       ]
     },
     zh: {
-      name: '中文', title: '嘉泉空教室',
+      name: '中文', title: '去哪儿？', tagline: '为课间无处可去的人准备的网站',
       days: ['一', '二', '三', '四', '五', '六', '日'], daysFull: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
       terms: { '10': '第1学期', '11': '夏季学期', '20': '第2学期', '21': '冬季学期' }, sem: (y, t) => `${y}年${t}`,
       loadingSchool: '正在加载学校课表', campus: '校区', global: '全球校区', medical: '医学校区',
@@ -427,7 +435,7 @@ button { cursor: pointer; }
       ]
     },
     vi: {
-      name: 'Tiếng Việt', title: 'Phòng trống Gachon',
+      name: 'Tiếng Việt', title: 'Đi đâu đây?', tagline: 'Dành cho những ai không biết đi đâu giữa các tiết học',
       days: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'], daysFull: ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật'],
       terms: { '10': 'Học kỳ 1', '11': 'Học kỳ hè', '20': 'Học kỳ 2', '21': 'Học kỳ đông' }, sem: (y, t) => `${t} năm ${y}`,
       loadingSchool: 'Đang tải thời khóa biểu của trường', campus: 'Cơ sở', global: 'Cơ sở Global', medical: 'Cơ sở Y khoa',
@@ -457,7 +465,7 @@ button { cursor: pointer; }
       ]
     },
     mn: {
-      name: 'Монгол', title: 'Гачон сул анги',
+      name: 'Монгол', title: 'Хаашаа явах вэ?', tagline: 'Хичээлийн завсарт очих газаргүй хүмүүст зориулсан вэб сайт',
       days: ['Да', 'Мя', 'Лх', 'Пү', 'Ба', 'Бя', 'Ня'], daysFull: ['Даваа', 'Мягмар', 'Лхагва', 'Пүрэв', 'Баасан', 'Бямба', 'Ням'],
       terms: { '10': '1-р улирал', '11': 'зуны улирал', '20': '2-р улирал', '21': 'өвлийн улирал' }, sem: (y, t) => `${y} оны ${t}`,
       loadingSchool: 'Сургуулийн хуваарийг ачаалж байна', campus: 'Кампус', global: 'Глобал кампус', medical: 'Анагаахын кампус',
