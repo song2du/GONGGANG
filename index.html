@@ -65,6 +65,9 @@ html { -webkit-text-size-adjust: 100%; }
 [hidden] { display: none !important; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
 .src-live { color: var(--free); }
+.tr { display: block; font-size: 12px; font-weight: 400; color: var(--ink-3); line-height: 1.35; letter-spacing: 0; }
+.mp-h h2 .tr { font-size: 13px; margin-top: 2px; }
+.m-lbl.sub { font-weight: 500; fill: var(--ink-2); }
 html[lang="ja"] { --sans: "IBM Plex Sans", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Noto Sans JP", "IBM Plex Sans KR", system-ui, sans-serif; }
 html[lang="zh"] { --sans: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "IBM Plex Sans KR", system-ui, sans-serif; }
 .wrap { max-width: 1160px; margin: 0 auto; padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 18px; }
@@ -494,6 +497,44 @@ button { cursor: pointer; }
   let LANG = pickLang();
   const T = () => I18N[LANG];
 
+  // 건물 이름 번역: en, ja, zh, vi, mn (한국어 화면에서는 쓰지 않음)
+  const BLD = {
+    '가천관': ['Gachon Hall', '嘉泉館', '嘉泉馆', 'Tòa Gachon', 'Гачон танхим'],
+    '비전타워': ['Vision Tower', 'ビジョンタワー', '愿景塔', 'Tòa tháp Vision', 'Вижн тауэр'],
+    '공과대학1': ['Engineering Bldg. 1', '工科大学1号館', '工科大学1号楼', 'Tòa Kỹ thuật 1', 'Инженерийн байр 1'],
+    '공과대학2': ['Engineering Bldg. 2', '工科大学2号館', '工科大学2号楼', 'Tòa Kỹ thuật 2', 'Инженерийн байр 2'],
+    'AI관': ['AI Building', 'AI館', 'AI馆', 'Tòa AI', 'AI байр'],
+    '예술대학1': ['Arts & PE Bldg. 1', '芸術・体育大学1号館', '艺术体育大学1号楼', 'Tòa Nghệ thuật & Thể thao 1', 'Урлаг, спортын байр 1'],
+    '예술대학2': ['Arts & PE Bldg. 2', '芸術・体育大学2号館', '艺术体育大学2号楼', 'Tòa Nghệ thuật & Thể thao 2', 'Урлаг, спортын байр 2'],
+    '교육대학원': ['Graduate School of Education', '教育大学院', '教育研究生院', 'Cao học Giáo dục', 'Боловсролын магистрын сургууль'],
+    '글로벌센터': ['Global Center', 'グローバルセンター', '全球中心', 'Trung tâm Toàn cầu', 'Глобал төв'],
+    '바이오나노대학': ['BioNano College', 'バイオナノ大学', '生物纳米大学', 'Trường BioNano', 'Био нано сургууль'],
+    '바이오나노연구원': ['BioNano Institute', 'バイオナノ研究院', '生物纳米研究院', 'Viện BioNano', 'Био нано хүрээлэн'],
+    '반도체대학': ['Semiconductor College', '半導体大学', '半导体大学', 'Trường Bán dẫn', 'Хагас дамжуулагчийн сургууль'],
+    '한의과대학': ['College of Korean Medicine', '韓医科大学', '韩医科大学', 'Trường Y học cổ truyền', 'Уламжлалт анагаахын сургууль'],
+    '대학원': ['Graduate School', '大学院', '研究生院', 'Sau đại học', 'Магистрын сургууль'],
+    '학생회관': ['Student Union', '学生会館', '学生会馆', 'Nhà Sinh viên', 'Оюутны төв'],
+    '제1학생생활관': ['Dormitory 1', '第1学生寮', '第1学生宿舍', 'Ký túc xá 1', 'Оюутны байр 1'],
+    '제2학생생활관': ['Dormitory 2', '第2学生寮', '第2学生宿舍', 'Ký túc xá 2', 'Оюутны байр 2'],
+    '제3학생생활관': ['Dormitory 3', '第3学生寮', '第3学生宿舍', 'Ký túc xá 3', 'Оюутны байр 3'],
+    '법과대학': ['Law Building', '法科大学', '法科大学', 'Tòa Luật', 'Хуулийн байр'],
+    '전자정보도서관': ['Digital Library', '電子情報図書館', '电子信息图书馆', 'Thư viện Điện tử', 'Цахим номын сан'],
+    '중앙도서관': ['Central Library', '中央図書館', '中央图书馆', 'Thư viện Trung tâm', 'Төв номын сан'],
+    '간호대학': ['College of Nursing', '看護大学', '护理大学', 'Trường Điều dưỡng', 'Сувилахуйн сургууль'],
+    '의과학대학': ['College of Medical Science', '医科学大学', '医科学大学', 'Trường Khoa học Y khoa', 'Анагаахын шинжлэх ухааны сургууль'],
+    '약학대학': ['College of Pharmacy', '薬学大学', '药学大学', 'Trường Dược', 'Эм зүйн сургууль'],
+    '의과대학': ['College of Medicine', '医科大学', '医科大学', 'Trường Y', 'Анагаахын сургууль'],
+    '체육관': ['Gymnasium', '体育館', '体育馆', 'Nhà thi đấu', 'Спорт заал'],
+    '운동장': ['Sports Field', '運動場', '运动场', 'Sân vận động', 'Спорт талбай']
+  };
+  BLD['제3생활관'] = BLD['제3학생생활관'];
+  BLD['AI공학관'] = BLD['AI관'];
+  BLD['예술ㆍ체육대학1'] = BLD['예술대학1'];
+  BLD['예술ㆍ체육대학2'] = BLD['예술대학2'];
+  const BLD_LANGS = ['en', 'ja', 'zh', 'vi', 'mn'];
+  const bt = (name) => { const v = LANG !== 'ko' && BLD[name]; return v ? v[BLD_LANGS.indexOf(LANG)] || '' : ''; };
+  const trSpan = (name) => bt(name) ? `<span class="tr">${esc(bt(name))}</span>` : '';
+
   const S = {
     campus: store.get('gc.campus') === 'M' ? 'M' : 'G',
     mapBld: '',
@@ -626,7 +667,7 @@ button { cursor: pointer; }
 
   function drawCards(G) {
     const list = [...G.values()].sort((a, b) => ko(displayName(a), displayName(b)));
-    $('mapMain').innerHTML = `<div class="board"><p class="note">${T().cardsFallback}</p><div class="cards">${list.map((e) => `<button type="button" class="card" data-mb="${esc(e.key)}" aria-pressed="${S.mapBld === e.key}"><span class="nm">${esc(displayName(e))}</span><span class="ct${e.free ? '' : ' zero'}">${e.free}</span><small>${T().cardSub(e.maybe, e.total)}</small></button>`).join('')}</div></div>`;
+    $('mapMain').innerHTML = `<div class="board"><p class="note">${T().cardsFallback}</p><div class="cards">${list.map((e) => `<button type="button" class="card" data-mb="${esc(e.key)}" aria-pressed="${S.mapBld === e.key}"><span class="nm">${esc(displayName(e))}${trSpan(displayName(e))}</span><span class="ct${e.free ? '' : ' zero'}">${e.free}</span><small>${T().cardSub(e.maybe, e.total)}</small></button>`).join('')}</div></div>`;
   }
 
   function drawSvgMap(G) {
@@ -650,7 +691,7 @@ button { cursor: pointer; }
   function offsiteHTML(G, GEO) {
     const list = (GEO.offsite || []).map((o) => ({ o, e: G.get(o.name) })).filter((x) => x.e);
     if (!list.length) return '';
-    return `<div class="offsite">${list.map(({ o, e }) => `<button type="button" data-mb="${esc(e.key)}" aria-pressed="${S.mapBld === e.key}"><span class="nm">${esc(o.name)}</span><span class="ct">${e.free}</span></button>`).join('')}</div>`;
+    return `<div class="offsite">${list.map(({ o, e }) => `<button type="button" data-mb="${esc(e.key)}" aria-pressed="${S.mapBld === e.key}"><span class="nm">${esc(o.name)}${trSpan(o.name)}</span><span class="ct">${e.free}</span></button>`).join('')}</div>`;
   }
 
   function drawOverlay(G) {
@@ -661,7 +702,7 @@ button { cursor: pointer; }
     const placed = [];
     const hit = (r) => placed.some((p) => r.x < p.x + p.w && p.x < r.x + r.w && r.y < p.y + p.h && p.y < r.y + r.h);
     const inView = (r) => r.x >= 2 && r.y >= 2 && r.x + r.w <= GEO.W - 2 && r.y + r.h <= GEO.H - 2;
-    const tw = (s, px) => [...s].reduce((a, c) => a + (/[가-힣ㆍ]/.test(c) ? 1 : 0.6), 0) * px * k;
+    const tw = (s, px) => [...s].reduce((a, c) => a + (/[가-힣ㆍ\u3040-\u30ff\u3400-\u9fff\uff00-\uffef]/.test(c) ? 1 : 0.62), 0) * px * k;
     let html = '';
     const st = GEO.station;
     if (st) {
@@ -684,8 +725,8 @@ button { cursor: pointer; }
     for (const x of active) {
       const e = x.e, sel = S.mapBld === e.key ? ' sel' : '';
       const lead = (x.cx !== x.b.x || x.cy !== x.b.y) ? `<line x1="${x.b.x}" y1="${x.b.y}" x2="${x.cx}" y2="${x.cy}" stroke="var(--ink-3)" stroke-width="${1.2 * k}"/>` : '';
-      bubbles += `<g class="m-bub m-hit${e.free ? '' : ' zero'}${sel}" data-mb="${esc(e.key)}" tabindex="0" role="button" aria-label="${esc(displayName(e))}, ${T().freeRooms} ${e.free}">${lead}<circle cx="${x.cx}" cy="${x.cy}" r="${r}" stroke-width="${1.6 * k}"/><text x="${x.cx}" y="${x.cy}" font-size="${11.5 * k}">${e.free}</text></g>`;
-      const name = displayName(e), fs = 12.5 * k, w = tw(name, 12.5), h = 15 * k, gap = 4 * k;
+      bubbles += `<g class="m-bub m-hit${e.free ? '' : ' zero'}${sel}" data-mb="${esc(e.key)}" tabindex="0" role="button" aria-label="${esc(displayName(e))}${bt(displayName(e)) ? ' (' + esc(bt(displayName(e))) + ')' : ''}, ${T().freeRooms} ${e.free}">${lead}<circle cx="${x.cx}" cy="${x.cy}" r="${r}" stroke-width="${1.6 * k}"/><text x="${x.cx}" y="${x.cy}" font-size="${11.5 * k}">${e.free}</text></g>`;
+      const name = displayName(e), sub = bt(name), fs = 12.5 * k, w = Math.max(tw(name, 12.5), sub ? tw(sub, 10.5) : 0), h = (sub ? 28 : 15) * k, gap = 4 * k;
       const cands = [
         { x: x.cx + r + gap, y: x.cy - h / 2 },
         { x: x.cx - r - gap - w, y: x.cy - h / 2 },
@@ -693,13 +734,13 @@ button { cursor: pointer; }
         { x: x.cx - w / 2, y: x.cy + r + gap }
       ];
       const c = cands.find((c) => { const rr = { x: c.x, y: c.y, w, h }; return inView(rr) && !hit(rr); });
-      if (c) { placed.push({ x: c.x, y: c.y, w, h }); labels += `<text class="m-lbl" x="${c.x}" y="${c.y + h * 0.78}" font-size="${fs}" stroke-width="${3 * k}">${esc(name)}</text>`; }
+      if (c) { placed.push({ x: c.x, y: c.y, w, h }); labels += `<text class="m-lbl" x="${c.x}" y="${c.y + 15 * k * 0.78}" font-size="${fs}" stroke-width="${3 * k}">${esc(name)}</text>` + (sub ? `<text class="m-lbl sub" x="${c.x}" y="${c.y + 15 * k + 10.5 * k * 0.9}" font-size="${10.5 * k}" stroke-width="${3 * k}">${esc(sub)}</text>` : ''); }
     }
     for (const x of idle) {
-      const name = x.b.name, fs = 11 * k, w = tw(name, 11), h = 13 * k;
+      const name = x.b.name, sub = bt(name), fs = 11 * k, w = Math.max(tw(name, 11), sub ? tw(sub, 10) : 0), h = (sub ? 25 : 13) * k;
       const cands = [{ x: x.b.x - w / 2, y: x.b.y - h / 2 }, { x: x.b.x - w / 2, y: x.b.y - h - 6 * k }, { x: x.b.x - w / 2, y: x.b.y + 6 * k }];
       const c = cands.find((c) => { const rr = { x: c.x, y: c.y, w, h }; return inView(rr) && !hit(rr); });
-      if (c) { placed.push({ x: c.x, y: c.y, w, h }); labels += `<text class="m-lbl idle" x="${c.x}" y="${c.y + h * 0.78}" font-size="${fs}" stroke-width="${3 * k}">${esc(name)}</text>`; }
+      if (c) { placed.push({ x: c.x, y: c.y, w, h }); labels += `<text class="m-lbl idle" x="${c.x}" y="${c.y + 13 * k * 0.78}" font-size="${fs}" stroke-width="${3 * k}">${esc(name)}</text>` + (sub ? `<text class="m-lbl idle sub" x="${c.x}" y="${c.y + 13 * k + 10 * k * 0.9}" font-size="${10 * k}" stroke-width="${3 * k}">${esc(sub)}</text>` : ''); }
     }
     const sx = GEO.W - 24 * k - 100, sy = GEO.H - 22 * k;
     const scale = `<g class="m-scale" aria-hidden="true"><line x1="${sx}" y1="${sy}" x2="${sx + 100}" y2="${sy}" stroke-width="${2 * k}"/><line x1="${sx}" y1="${sy - 4 * k}" x2="${sx}" y2="${sy + 4 * k}" stroke-width="${2 * k}"/><line x1="${sx + 100}" y1="${sy - 4 * k}" x2="${sx + 100}" y2="${sy + 4 * k}" stroke-width="${2 * k}"/><text x="${sx + 50}" y="${sy - 8 * k}" font-size="${11 * k}" text-anchor="middle">100 m</text></g>`;
@@ -722,7 +763,7 @@ button { cursor: pointer; }
       const tag = (k) => !GEO || onMap.has(k) ? '' : off.has(k) ? '' : `<small>${T().noMapPos}</small>`;
       const list = [...G.values()].sort((a, b) => ko(displayName(a), displayName(b)));
       el.innerHTML = `<div class="mp-h"><div><h2>${T().buildings}</h2><p>${GEO ? T().hintMap : T().hintCards}</p></div></div>
-        <div class="rank">${list.map((x) => `<button type="button" data-mb="${esc(x.key)}"><span class="nm">${esc(displayName(x))}${tag(x.key)}</span><span class="f">${x.free}</span><span class="m">${x.maybe ? '+' + x.maybe : ''}</span></button>`).join('')}</div>
+        <div class="rank">${list.map((x) => `<button type="button" data-mb="${esc(x.key)}"><span class="nm">${esc(displayName(x))}${tag(x.key)}${trSpan(displayName(x))}</span><span class="f">${x.free}</span><span class="m">${x.maybe ? '+' + x.maybe : ''}</span></button>`).join('')}</div>
         <p class="note">${T().rankNote}</p>`;
       return;
     }
@@ -733,7 +774,7 @@ button { cursor: pointer; }
       ? `<a href="https://map.kakao.com/link/map/${encodeURIComponent(q)},${geo.lat},${geo.lon}">${T().kakao}</a><a href="https://map.naver.com/p/search/${encodeURIComponent(q)}">${T().naver}</a><a href="https://www.google.com/maps/search/?api=1&query=${geo.lat},${geo.lon}">${T().google}</a>`
       : `<a href="https://map.kakao.com/?q=${encodeURIComponent(q)}">${T().kakao}</a><a href="https://map.naver.com/p/search/${encodeURIComponent(q)}">${T().naver}</a><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}">${T().google}</a>`;
     const plates = platesHTML(e.list);
-    el.innerHTML = `<div class="mp-h"><div><h2>${esc(displayName(e))}</h2><p>${T().bldStats(e.free, e.maybe, e.total)}</p></div><button type="button" class="ghost" id="panelBack">${T().allBuildings}</button></div>
+    el.innerHTML = `<div class="mp-h"><div><h2>${esc(displayName(e))}${trSpan(displayName(e))}</h2><p>${T().bldStats(e.free, e.maybe, e.total)}</p></div><button type="button" class="ghost" id="panelBack">${T().allBuildings}</button></div>
       <div class="links">${links}</div>
       ${plates ? `<div class="plates">${plates}</div>` : `<div class="empty">${T().allBusy}</div>`}`;
     $('panelBack').onclick = () => { S.mapBld = ''; render(); };
@@ -788,7 +829,7 @@ button { cursor: pointer; }
     return `
       <button type="button" class="ghost crumb" id="roomBack">${esc(T().backTo(bldName))}</button>
       <div class="detail-h">
-        <div class="t"><span class="b">${esc(room.bld)}</span><span class="r">${esc(room.no || room.bld)}</span><span class="s">${T().courses(seen.size)}</span></div>
+        <div class="t"><span class="b">${esc(room.bld)}${bt(room.bld) ? ' · ' + esc(bt(room.bld)) : ''}</span><span class="r">${esc(room.no || room.bld)}</span><span class="s">${T().courses(seen.size)}</span></div>
         <span class="state ${st.st}">${T().daysFull[S.day]} ${S.nowMode ? T().now : hhmm(S.ws)} · ${stTxt}</span>
       </div>
       <div class="legend"><span><i></i>${T().lgRegular}</span><span><i class="p"></i>${T().lgPart}</span><span><i class="x"></i>${T().lgMulti}</span><span><i class="w"></i>${T().lgSel}</span></div>
