@@ -37,4 +37,9 @@ node scripts/fetch-timetable.mjs 2027-10  # 특정 학기
 python3 -m http.server                    # http://localhost:8000 에서 확인
 ```
 
+## 만든 사람
+
+- [Yidu Song (@song2du)](https://github.com/song2du) — 기획, 디자인 방향
+- Claude (Anthropic) — 구현 도움
+
 지도 데이터 © [OpenStreetMap](https://www.openstreetmap.org/copyright) 기여자 (ODbL)
