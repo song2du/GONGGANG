@@ -89,7 +89,8 @@ button { cursor: pointer; }
 .label { font-size: 12px; font-weight: 600; color: var(--ink-3); letter-spacing: 0.04em; }
 .days button { padding: 6px 10px; }
 .hours { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.hours select { padding: 7px 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); font-family: var(--mono); }
+.hours select, .hours input[type="time"] { padding: 7px 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); font-family: var(--mono); }
+.hours input[type="time"] { min-width: 8em; min-height: 38px; }
 .now { border: 1px solid var(--accent-line); background: var(--card); color: var(--accent); border-radius: 8px; padding: 7px 12px; font-weight: 600; }
 .now[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .search { display: flex; gap: 6px; }
@@ -244,7 +245,7 @@ button { cursor: pointer; }
     <div class="tgroup">
       <span class="label">시간</span>
       <div class="hours">
-        <select id="startSel" aria-label="시각"></select>
+        <input type="time" id="startSel" step="60" aria-label="시각" required>
         <button type="button" class="now" id="nowBtn" aria-pressed="false">지금</button>
       </div>
     </div>
@@ -394,10 +395,8 @@ button { cursor: pointer; }
   function renderControls() {
     for (const b of $('campusSeg').querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.c === S.campus));
     $('daySeg').innerHTML = DAYS.map((d, i) => `<button type="button" data-d="${i}" aria-pressed="${i === S.day}" aria-label="${DAY_FULL[i]}">${d}</button>`).join('');
-    const slot = Math.floor(S.ws * 2) / 2;
-    let opts = S.nowMode ? `<option value="now" selected>${hhmm(S.ws)} (지금)</option>` : '';
-    for (let x = FIRST; x < LAST; x += 0.5) opts += `<option value="${x}"${!S.nowMode && x === slot ? ' selected' : ''}>${hhmm(x)}</option>`;
-    $('startSel').innerHTML = opts;
+    const ti = $('startSel');
+    if (document.activeElement !== ti) ti.value = hhmm(S.ws);
     $('nowBtn').setAttribute('aria-pressed', String(S.nowMode));
     $('roomList').innerHTML = campusRooms().sort((a, b) => ko(a.label, b.label)).map((r) => `<option value="${esc(r.label)}"></option>`).join('');
   }
@@ -639,8 +638,8 @@ button { cursor: pointer; }
     applyTheme(store.get('gc.theme'));
     $('themeSeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; store.set('gc.theme', b.dataset.t); applyTheme(b.dataset.t); };
     $('campusSeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.campus = b.dataset.c; S.mapBld = ''; S.room = null; store.set('gc.campus', S.campus); renderControls(); render(); };
-    $('daySeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.day = +b.dataset.d; if (S.nowMode) { S.nowMode = false; S.ws = Math.floor(S.ws * 2) / 2; S.we = S.ws + 1 / 60; } renderControls(); render(); };
-    $('startSel').onchange = () => { const v = $('startSel').value; if (v === 'now') return; S.nowMode = false; S.ws = +v; S.we = S.ws + 1 / 60; renderControls(); render(); };
+    $('daySeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.day = +b.dataset.d; S.nowMode = false; renderControls(); render(); };
+    $('startSel').oninput = () => { const m = /^(\d{2}):(\d{2})/.exec($('startSel').value); if (!m) return; S.nowMode = false; S.ws = +m[1] + +m[2] / 60; S.we = S.ws + 1 / 60; $('nowBtn').setAttribute('aria-pressed', 'false'); render(); };
     $('nowBtn').onclick = () => { setNow(); renderControls(); render(); };
     const roomClick = (e) => { const b = e.target.closest('[data-room]'); if (b) { openRoom(b.dataset.room); return true; } return false; };
     $('mapPanel').onclick = (e) => { if (roomClick(e)) return; const b = e.target.closest('[data-mb]'); if (b) selectMapBld(b.dataset.mb); };
