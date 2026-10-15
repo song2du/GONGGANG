@@ -338,12 +338,12 @@ button { cursor: pointer; }
       noYet: '아직 시간표 없음', notPosted: (s) => `학교에 ${s} 시간표가 아직 올라오지 않았어요.`, fetching: '학교 서버에서 시간표 받는 중…',
       failShort: '학교 서버에 연결하지 못했어요', failLong: '학교 서버에 연결하지 못했어요. 잠시 후 새로고침해 주세요.',
       notes: [
-        `출처: <a href="${SRC_URL}">가천대학교 시간표 및 강의계획서 조회</a>. 매일 아침 학교 시간표를 확인해서 바뀐 내용이 있으면 저장본을 갱신하고, 페이지는 이 저장본을 보여줘요. 새 학기 첫날처럼 최근 저장본이 없을 때만 학교 서버에서 바로 받아와요. 학기는 날짜에 맞춰 자동으로 바뀌어요(3~8월 1학기, 9~2월 2학기). 학교와 관계없는 학생용 비공식 페이지예요.`,
-        `지도: <a href="${OSM_URL}">© OpenStreetMap 기여자</a>의 건물·길 데이터로 그렸어요. 메디컬캠퍼스 건물 이름은 카카오맵·네이버 지도 표시와 건물 주소로 확인했어요(의과학대학은 지도에 옛 이름 보건과학대학으로 나와요). 바이오나노대학은 위치를 확인하지 못해서 지도 옆 건물 목록에만 나와요.`,
-        '교시는 1교시 09:00부터 교시당 1시간으로 계산했어요.',
-        '시간표에 있는 정규 수업만 반영해요. 보강, 시험, 행사, 스터디룸 예약, 문 잠김은 알 수 없어요.',
-        '이번 학기 수업이 하나도 없는 강의실은 목록에 나오지 않아요.',
-        '<b>확인 필요</b>는 12주·4주처럼 학기 일부 기간만 하는 수업이나, 강의실이 여러 곳으로 적힌 수업이 걸려 있어서 실제로는 쓰일 수도 있는 강의실이에요.'
+        `출처: <a href="${SRC_URL}">가천대학교 시간표 및 강의계획서 조회</a>`,
+        '학교와 관계없는 학생용 비공식 페이지입니다',
+        `지도: <a href="${OSM_URL}">© OpenStreetMap 기여자</a>`,
+        '시간표에 있는 정규 수업만 반영합니다. 보강, 시험, 행사, 스터디룸 예약, 문 잠김은 알 수 없습니다',
+        '이번 학기 수업이 하나도 없는 강의실은 목록에 나오지 않습니다',
+        '<b>확인 필요</b>는 12주·4주처럼 학기 일부 기간만 하는 수업이나, 강의실이 여러 곳으로 적힌 수업이 걸려 있어서 실제로는 쓰일 수도 있는 강의실입니다'
       ]
     },
     en: {
@@ -368,12 +368,12 @@ button { cursor: pointer; }
       noYet: 'No timetable yet', notPosted: (s) => `The ${s} timetable isn't posted yet.`, fetching: 'Getting the timetable from the school…',
       failShort: "Couldn't reach the school server", failLong: "Couldn't reach the school server. Try reloading in a moment.",
       notes: [
-        `Source: <a href="${SRC_URL}">Gachon University timetable and syllabus lookup</a> (Korean). Every morning the timetable is checked against the school's, and the saved copy is updated when anything changed. The page shows that copy. Only when there is no recent copy, such as on the first day of a semester, does it get the timetable straight from the school server. The semester switches by date (March–August: spring, September–February: fall). This is an unofficial page made by students, not run by the university.`,
-        `Map: drawn from building and path data by <a href="${OSM_URL}">© OpenStreetMap contributors</a>. Medical Campus building names were checked against KakaoMap, Naver Map and building addresses (의과학대학 appears on maps under its old name, 보건과학대학). The location of 바이오나노대학 couldn't be confirmed, so it appears only in the building list beside the map.`,
-        'Period 1 starts at 09:00 and each period counts as one hour.',
-        "Only regular classes in the timetable are included. Make-up classes, exams, events, study-room bookings and locked doors aren't known.",
-        "Rooms with no classes at all this semester aren't listed.",
-        '<b>Check</b> marks rooms that may still be in use: a part-term class (such as 12 or 4 weeks) or a class listed with several rooms is scheduled there.'
+        `Source: <a href="${SRC_URL}">Gachon University timetable and syllabus lookup</a> (Korean)`,
+        'An unofficial page made by students, not affiliated with the university',
+        `Map: <a href="${OSM_URL}">© OpenStreetMap contributors</a>`,
+        "Only regular classes in the timetable are included. Make-up classes, exams, events, study-room bookings and locked doors aren't known",
+        "Rooms with no classes at all this semester aren't listed",
+        '<b>Check</b> marks rooms that may still be in use: a part-term class (such as 12 or 4 weeks) or a class listed with several rooms is scheduled there'
       ]
     },
     ja: {
@@ -398,12 +398,12 @@ button { cursor: pointer; }
       noYet: '時間割未公開', notPosted: (s) => `${s}の時間割はまだ公開されていません。`, fetching: '学校から時間割を取得中…',
       failShort: '学校のサーバーに接続できませんでした', failLong: '学校のサーバーに接続できませんでした。しばらくしてから再読み込みしてください。',
       notes: [
-        `出典：<a href="${SRC_URL}">嘉泉大学 時間割・シラバス照会</a>（韓国語）。毎朝学校の時間割を確認し、変更があれば保存データを更新します。ページはこの保存データを表示します。学期の初日など、最近の保存データがないときだけ学校のサーバーから直接取得します。学期は日付に合わせて自動で切り替わります（3〜8月は1学期、9〜2月は2学期）。大学とは関係のない、学生が作った非公式のページです。`,
-        `地図：<a href="${OSM_URL}">© OpenStreetMap 貢献者</a>の建物・道のデータで描いています。メディカルキャンパスの建物名はカカオマップ・NAVER地図の表示と建物の住所で確認しました（의과학대학は地図上で旧名の보건과학대학と表示されます）。바이오나노대학は位置を確認できなかったため、地図横の建物一覧にだけ表示されます。`,
-        '時限は1限を09:00とし、1時限を1時間として計算しています。',
-        '時間割にある通常の授業だけを反映しています。補講、試験、行事、自習室の予約、施錠の有無はわかりません。',
-        '今学期に授業が一つもない教室は表示されません。',
-        '<b>要確認</b>は、12週・4週のように学期の一部だけ行う授業や、複数の教室が書かれた授業が入っているため、実際には使われているかもしれない教室です。'
+        `出典：<a href="${SRC_URL}">嘉泉大学 時間割・シラバス照会</a>（韓国語）`,
+        '大学とは関係のない、学生が作った非公式のページです',
+        `地図：<a href="${OSM_URL}">© OpenStreetMap 貢献者</a>`,
+        '時間割にある通常の授業だけを反映しています。補講、試験、行事、自習室の予約、施錠の有無はわかりません',
+        '今学期に授業が一つもない教室は表示されません',
+        '<b>要確認</b>は、12週・4週のように学期の一部だけ行う授業や、複数の教室が書かれた授業が入っているため、実際には使われているかもしれない教室です'
       ]
     },
     zh: {
@@ -428,12 +428,12 @@ button { cursor: pointer; }
       noYet: '暂无课表', notPosted: (s) => `学校尚未发布${s}课表。`, fetching: '正在从学校获取课表…',
       failShort: '无法连接学校服务器', failLong: '无法连接学校服务器，请稍后刷新。',
       notes: [
-        `来源：<a href="${SRC_URL}">嘉泉大学课表及教学大纲查询</a>（韩语）。每天早上会与学校课表核对，有变化时更新保存版，页面显示的就是这个保存版。只有在没有近期保存版时（例如新学期第一天），才会直接从学校服务器获取课表。学期按日期自动切换（3–8月为第1学期，9–2月为第2学期）。本页面是学生制作的非官方页面，与学校无关。`,
-        `地图：根据 <a href="${OSM_URL}">© OpenStreetMap 贡献者</a> 的建筑和道路数据绘制。医学校区的建筑名称已对照 Kakao地图、Naver地图的标注及建筑地址核实（의과학대학 在地图上显示为旧名 보건과학대학）。바이오나노대학 的位置无法确认，因此只显示在地图旁的建筑列表中。`,
-        '第1节从09:00开始，每节按1小时计算。',
-        '只包含课表中的常规课程。补课、考试、活动、自习室预约以及教室是否上锁无法得知。',
-        '本学期没有任何课程的教室不会显示。',
-        '<b>需确认</b>表示该教室排有只上部分学期的课程（如12周、4周）或登记了多个教室的课程，实际可能正在使用。'
+        `来源：<a href="${SRC_URL}">嘉泉大学课表及教学大纲查询</a>（韩语）`,
+        '本页面是学生制作的非官方页面，与学校无关',
+        `地图：<a href="${OSM_URL}">© OpenStreetMap 贡献者</a>`,
+        '只包含课表中的常规课程。补课、考试、活动、自习室预约以及教室是否上锁无法得知',
+        '本学期没有任何课程的教室不会显示',
+        '<b>需确认</b>表示该教室排有只上部分学期的课程（如12周、4周）或登记了多个教室的课程，实际可能正在使用'
       ]
     },
     vi: {
@@ -458,12 +458,12 @@ button { cursor: pointer; }
       noYet: 'Chưa có thời khóa biểu', notPosted: (s) => `Trường chưa đăng thời khóa biểu ${s}.`, fetching: 'Đang lấy thời khóa biểu từ trường…',
       failShort: 'Không kết nối được máy chủ của trường', failLong: 'Không kết nối được máy chủ của trường. Hãy tải lại trang sau ít phút.',
       notes: [
-        `Nguồn: <a href="${SRC_URL}">Tra cứu thời khóa biểu và đề cương môn học của Đại học Gachon</a> (tiếng Hàn). Mỗi sáng, thời khóa biểu được đối chiếu với dữ liệu của trường và bản lưu được cập nhật khi có thay đổi; trang hiển thị bản lưu này. Chỉ khi chưa có bản lưu gần đây, chẳng hạn ngày đầu học kỳ, trang mới lấy thời khóa biểu trực tiếp từ máy chủ của trường. Học kỳ tự đổi theo ngày (tháng 3–8: học kỳ 1, tháng 9–2: học kỳ 2). Đây là trang không chính thức do sinh viên làm, không thuộc nhà trường.`,
-        `Bản đồ: vẽ từ dữ liệu tòa nhà và đường đi của <a href="${OSM_URL}">© những người đóng góp OpenStreetMap</a>. Tên tòa nhà ở Cơ sở Y khoa được đối chiếu với KakaoMap, Naver Map và địa chỉ tòa nhà (의과학대학 hiện trên bản đồ với tên cũ 보건과학대학). Chưa xác định được vị trí của 바이오나노대학 nên tòa nhà này chỉ có trong danh sách bên cạnh bản đồ.`,
-        'Tiết 1 bắt đầu lúc 09:00, mỗi tiết tính là 1 giờ.',
-        'Chỉ tính các lớp chính quy trong thời khóa biểu. Không biết được lớp học bù, thi, sự kiện, đặt phòng tự học hay phòng có khóa cửa không.',
-        'Phòng không có lớp nào trong học kỳ này sẽ không được hiển thị.',
-        '<b>Cần kiểm tra</b> là phòng có thể đang được dùng vì có lớp chỉ học một phần học kỳ (như 12 hoặc 4 tuần) hoặc lớp ghi nhiều phòng.'
+        `Nguồn: <a href="${SRC_URL}">Tra cứu thời khóa biểu và đề cương môn học của Đại học Gachon</a> (tiếng Hàn)`,
+        'Đây là trang không chính thức do sinh viên làm, không thuộc nhà trường',
+        `Bản đồ: <a href="${OSM_URL}">© những người đóng góp OpenStreetMap</a>`,
+        'Chỉ tính các lớp chính quy trong thời khóa biểu. Không biết được lớp học bù, thi, sự kiện, đặt phòng tự học hay phòng có khóa cửa không',
+        'Phòng không có lớp nào trong học kỳ này sẽ không được hiển thị',
+        '<b>Cần kiểm tra</b> là phòng có thể đang được dùng vì có lớp chỉ học một phần học kỳ (như 12 hoặc 4 tuần) hoặc lớp ghi nhiều phòng'
       ]
     },
     mn: {
@@ -488,12 +488,12 @@ button { cursor: pointer; }
       noYet: 'Хуваарь хараахан гараагүй', notPosted: (s) => `${s}-ын хуваарь хараахан гараагүй байна.`, fetching: 'Сургуулиас хуваарь татаж байна…',
       failShort: 'Сургуулийн серверт холбогдож чадсангүй', failLong: 'Сургуулийн серверт холбогдож чадсангүй. Хэсэг хугацааны дараа дахин ачаална уу.',
       notes: [
-        `Эх сурвалж: <a href="${SRC_URL}">Гачон их сургуулийн хичээлийн хуваарь, хөтөлбөрийн хайлт</a> (солонгос хэлээр). Өглөө бүр сургуулийн хуваарьтай тулгаж, өөрчлөлт гарвал хадгалсан хувилбарыг шинэчилнэ. Хуудас энэ хадгалсан хувилбарыг харуулна. Шинэ улирлын эхний өдөр гэх мэт саяхны хадгалсан хувилбар байхгүй үед л сургуулийн серверээс шууд татна. Улирал огноогоор автоматаар солигдоно (3–8 сар: 1-р улирал, 9–2 сар: 2-р улирал). Энэ нь сургуультай холбоогүй, оюутнуудын хийсэн албан бус хуудас юм.`,
-        `Газрын зураг: <a href="${OSM_URL}">© OpenStreetMap хувь нэмэр оруулагчид</a>-ын барилга, замын мэдээллээр зурсан. Анагаахын кампусын барилгын нэрийг KakaoMap, Naver Map болон барилгын хаягаар шалгасан (의과학대학 газрын зураг дээр хуучин нэр болох 보건과학대학 гэж харагдана). 바이오나노대학-ын байршлыг баталж чадаагүй тул зөвхөн газрын зургийн хажуугийн жагсаалтад гарна.`,
-        '1-р цаг 09:00-д эхэлж, цаг бүрийг 1 цагаар тооцсон.',
-        'Хуваарьт байгаа тогтмол хичээлүүдийг л тусгасан. Нөхөх хичээл, шалгалт, арга хэмжээ, бие даан суралцах өрөөний захиалга, хаалга түгжээтэй эсэхийг мэдэх боломжгүй.',
-        'Энэ улиралд огт хичээлгүй ангиуд жагсаалтад гарахгүй.',
-        '<b>Шалгах</b> гэдэг нь 12 эсвэл 4 долоо хоног гэх мэт улирлын зөвхөн нэг хэсэгт ордог хичээл, эсвэл олон анги бичигдсэн хичээл байгаа тул бодитоор ашиглагдаж байж болох анги юм.'
+        `Эх сурвалж: <a href="${SRC_URL}">Гачон их сургуулийн хичээлийн хуваарь, хөтөлбөрийн хайлт</a> (солонгос хэлээр)`,
+        'Энэ нь сургуультай холбоогүй, оюутнуудын хийсэн албан бус хуудас юм',
+        `Газрын зураг: <a href="${OSM_URL}">© OpenStreetMap хувь нэмэр оруулагчид</a>`,
+        'Хуваарьт байгаа тогтмол хичээлүүдийг л тусгасан. Нөхөх хичээл, шалгалт, арга хэмжээ, бие даан суралцах өрөөний захиалга, хаалга түгжээтэй эсэхийг мэдэх боломжгүй',
+        'Энэ улиралд огт хичээлгүй ангиуд жагсаалтад гарахгүй',
+        '<b>Шалгах</b> гэдэг нь 12 эсвэл 4 долоо хоног гэх мэт улирлын зөвхөн нэг хэсэгт ордог хичээл, эсвэл олон анги бичигдсэн хичээл байгаа тул бодитоор ашиглагдаж байж болох анги юм'
       ]
     }
   };
