@@ -96,7 +96,32 @@ button { cursor: pointer; }
 .lang { min-height: 38px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); color: var(--ink-2); font-weight: 500; }
 .seg.icon svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-.toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 22px; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; }
+.toolbar { display: flex; flex-direction: column; gap: 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; }
+.tb-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 22px; }
+.when-btn { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; border: 1px solid var(--accent-line); background: var(--accent-soft); color: var(--ink); border-radius: 10px; padding: 8px 12px 8px 14px; font-size: 18px; font-weight: 600; line-height: 1.3; text-align: left; }
+.when-btn:hover { border-color: var(--accent); }
+.when-btn .chev { flex: none; width: 18px; height: 18px; fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.when-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.when-panel { display: flex; flex-direction: column; gap: 14px; padding-top: 14px; border-top: 1px solid var(--rule); max-width: 560px; }
+.when-panel .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); width: 100%; }
+.when-panel .days button { padding: 6px 0; }
+.bars { display: flex; flex-direction: column; gap: 4px; }
+.bars-plot, .bars-x { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 3px; }
+.bars-plot { height: 108px; align-items: end; border-bottom: 1px solid var(--rule); }
+.bar { position: relative; height: 100%; border: 0; padding: 18px 0 0; background: transparent; display: flex; align-items: flex-end; border-radius: 4px 4px 0 0; }
+.bar i { display: block; width: 100%; height: calc(var(--v) * 100%); min-height: 2px; background: var(--g2); border-radius: 3px 3px 0 0; }
+.bar:hover i { background: var(--g3); }
+.bar[aria-pressed="true"] i { background: var(--accent); }
+.bar .tag { position: absolute; top: 0; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; line-height: 16px; color: var(--accent); white-space: nowrap; }
+.bars-x { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.bars-x span { text-align: center; white-space: nowrap; }
+.tb-row .tgroup.grow { max-width: 480px; }
+/* 좁은 화면에서는 고르는 칸이 버튼 바로 아래 펼쳐지도록 순서를 바꾼다 */
+@media (max-width: 719px) {
+  .tb-row { display: contents; }
+  .when-btn { order: 0; align-self: flex-start; } .when-panel { order: 1; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+  .toolbar .tgroup.grow { order: 2; flex: none; max-width: none; } #semField { order: 3; }
+}
 .tgroup { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .tgroup.grow { flex: 1 1 220px; }
 .label { font-size: 12px; font-weight: 600; color: var(--ink-3); letter-spacing: 0.04em; }
@@ -112,10 +137,9 @@ button { cursor: pointer; }
 .search input { flex: 1; min-width: 0; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); }
 .search button { border: 1px solid var(--rule); background: var(--card); border-radius: 8px; padding: 0 12px; }
 .err { color: var(--danger); font-size: 13px; margin: 0; }
-@media (max-width: 560px) { .toolbar { padding: 12px; } .tgroup.days-g { width: 100%; } .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); width: 100%; box-sizing: border-box; } .days button { padding: 6px 0; } }
+@media (max-width: 560px) { .toolbar { padding: 12px; } .when-btn { align-self: stretch; justify-content: space-between; } }
 
 .summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin: 0; }
-.summary .when { font-size: 20px; font-weight: 600; }
 .summary .counts { color: var(--ink-2); font-size: 14px; }
 .summary .counts b { font-family: var(--mono); font-weight: 600; }
 .summary .counts .f { color: var(--free); } .summary .counts .m { color: var(--maybe); }
@@ -226,7 +250,7 @@ button { cursor: pointer; }
 .notes a { color: var(--accent); }
 .loading { color: var(--ink-2); }
 @media (max-width: 560px) { :root { --rh: 34px; } .brand h1 { font-size: 22px; } .mappanel { padding: 14px; } .detail-h .r { font-size: 22px; } }
-@media (prefers-reduced-motion: no-preference) { .plate, .seg button, .rank button { transition: background-color .12s, border-color .12s; } }
+@media (prefers-reduced-motion: no-preference) { .plate, .seg button, .rank button { transition: background-color .12s, border-color .12s; } .when-btn .chev { transition: transform .15s; } }
 @media (prefers-reduced-motion: reduce) { .m-b { transition: none; } }
 </style>
 <script>try { var t0 = localStorage.getItem('gc.theme'); if (t0 === 'light' || t0 === 'dark') document.documentElement.setAttribute('data-mode', t0); } catch (e) {}</script>
@@ -255,29 +279,33 @@ button { cursor: pointer; }
   </header>
 
   <section class="toolbar" aria-label="찾기 조건" data-i18n-aria="filters">
-    <div class="tgroup days-g">
-      <span class="label" data-i18n="day">요일</span>
-      <div class="seg days" id="daySeg" aria-label="요일" data-i18n-aria="day"></div>
-    </div>
-    <div class="tgroup">
-      <span class="label" data-i18n="time">시간</span>
-      <div class="hours">
-        <input type="time" id="startSel" step="60" aria-label="시각" data-i18n-aria="time" required>
-        <button type="button" class="now" id="nowBtn" aria-pressed="false" data-i18n="now">지금</button>
+    <div class="tb-row">
+      <button type="button" class="when-btn" id="whenBtn" aria-expanded="false" aria-controls="whenPanel" title="요일·시간 바꾸기" data-i18n-title="changeTime"><span id="whenTxt"></span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="tgroup grow">
+        <label class="label" for="roomSearch" data-i18n="roomSearch">강의실 시간표 보기</label>
+        <form class="search" id="searchForm" autocomplete="off">
+          <input id="roomSearch" list="roomList" placeholder="가천관 612">
+          <button type="submit" data-i18n="show">보기</button>
+        </form>
+        <datalist id="roomList"></datalist>
+        <p class="err" id="searchErr" hidden></p>
+      </div>
+      <div class="tgroup" id="semField" hidden>
+        <label class="label" for="semSel" data-i18n="semester">학기</label>
+        <div class="hours"><select id="semSel"></select></div>
       </div>
     </div>
-    <div class="tgroup grow">
-      <label class="label" for="roomSearch" data-i18n="roomSearch">강의실 시간표 보기</label>
-      <form class="search" id="searchForm" autocomplete="off">
-        <input id="roomSearch" list="roomList" placeholder="가천관 612">
-        <button type="submit" data-i18n="show">보기</button>
-      </form>
-      <datalist id="roomList"></datalist>
-      <p class="err" id="searchErr" hidden></p>
-    </div>
-    <div class="tgroup" id="semField" hidden>
-      <label class="label" for="semSel" data-i18n="semester">학기</label>
-      <div class="hours"><select id="semSel"></select></div>
+    <div class="when-panel" id="whenPanel" hidden>
+      <div class="seg days" id="daySeg" aria-label="요일" data-i18n-aria="day"></div>
+      <div class="bars" role="group" aria-label="시간대별 빈 강의실" data-i18n-aria="byHour">
+        <div class="bars-plot" id="barsPlot"></div>
+        <div class="bars-x" id="barsX" aria-hidden="true"></div>
+      </div>
+      <div class="hours">
+        <label class="label" for="startSel" data-i18n="time">시간</label>
+        <input type="time" id="startSel" step="60" required>
+        <button type="button" class="now" id="nowBtn" aria-pressed="false" data-i18n="now">지금</button>
+      </div>
     </div>
   </section>
 
@@ -322,7 +350,7 @@ button { cursor: pointer; }
       terms: { '10': '1학기', '11': '여름계절', '20': '2학기', '21': '겨울계절' }, sem: (y, t) => `${y}년 ${t}`,
       loadingSchool: '학교 시간표를 불러오는 중', campus: '캠퍼스', global: '글로벌캠퍼스', medical: '메디컬캠퍼스',
       theme: '화면 모드', themeSystem: '시스템 설정 따르기', themeLight: '라이트 모드', themeDark: '다크 모드', lang: '언어',
-      filters: '찾기 조건', day: '요일', time: '시간', now: '지금', roomSearch: '강의실 시간표 보기', show: '보기', semester: '학기', loading: '시간표 불러오는 중…',
+      filters: '찾기 조건', day: '요일', time: '시간', now: '지금', changeTime: '요일·시간 바꾸기', byHour: '시간대별 빈 강의실', barAria: (h, n) => `${h}, 빈 강의실 ${n}곳`, roomSearch: '강의실 시간표 보기', show: '보기', semester: '학기', loading: '시간표 불러오는 중…',
       weeks: (n) => `${n}주 수업`, multi: '여러 강의실', noMore: '이후 수업 없음', free: '비어 있음', maybe: '확인 필요', busy: '수업 중', nowPrefix: '지금 · ',
       counts: (f, m, b) => `빈 강의실 <b class="f">${f}</b>곳 · 확인 필요 <b class="m">${m}</b>곳 · 수업 중 <b>${b}</b>곳`,
       cardsFallback: '지도 데이터를 불러오지 못해서 건물 카드로 보여드려요.', mapAria: (c) => `${c} 지도. 건물 색이 진할수록 빈 강의실이 많아요.`,
@@ -352,7 +380,7 @@ button { cursor: pointer; }
       terms: { '10': 'Spring', '11': 'Summer session', '20': 'Fall', '21': 'Winter session' }, sem: (y, t) => `${t} ${y}`,
       loadingSchool: 'Loading the school timetable', campus: 'Campus', global: 'Global Campus', medical: 'Medical Campus',
       theme: 'Display mode', themeSystem: 'Match system setting', themeLight: 'Light mode', themeDark: 'Dark mode', lang: 'Language',
-      filters: 'Search options', day: 'Day', time: 'Time', now: 'Now', roomSearch: 'Room timetable', show: 'View', semester: 'Semester', loading: 'Loading timetable…',
+      filters: 'Search options', day: 'Day', time: 'Time', now: 'Now', changeTime: 'Change day and time', byHour: 'Free rooms by hour', barAria: (h, n) => `${h}, ${n} free`, roomSearch: 'Room timetable', show: 'View', semester: 'Semester', loading: 'Loading timetable…',
       weeks: (n) => `${n}-week class`, multi: 'Multiple rooms', noMore: 'No more classes', free: 'Free', maybe: 'Check', busy: 'In class', nowPrefix: 'Now · ',
       counts: (f, m, b) => `<b class="f">${f}</b> free · <b class="m">${m}</b> to check · <b>${b}</b> in class`,
       cardsFallback: "The map couldn't load, so buildings are shown as cards.", mapAria: (c) => `${c} map. Darker buildings have more free rooms.`,
@@ -382,7 +410,7 @@ button { cursor: pointer; }
       terms: { '10': '1学期', '11': '夏季学期', '20': '2学期', '21': '冬季学期' }, sem: (y, t) => `${y}年 ${t}`,
       loadingSchool: '学校の時間割を読み込み中', campus: 'キャンパス', global: 'グローバルキャンパス', medical: 'メディカルキャンパス',
       theme: '表示モード', themeSystem: 'システム設定に合わせる', themeLight: 'ライトモード', themeDark: 'ダークモード', lang: '言語',
-      filters: '検索条件', day: '曜日', time: '時刻', now: '今', roomSearch: '教室の時間割', show: '表示', semester: '学期', loading: '時間割を読み込み中…',
+      filters: '検索条件', day: '曜日', time: '時刻', now: '今', changeTime: '曜日・時刻を変更', byHour: '時間帯別の空き教室', barAria: (h, n) => `${h}、空き教室 ${n}室`, roomSearch: '教室の時間割', show: '表示', semester: '学期', loading: '時間割を読み込み中…',
       weeks: (n) => `${n}週の授業`, multi: '複数教室', noMore: '以降授業なし', free: '空き', maybe: '要確認', busy: '授業中', nowPrefix: '今 · ',
       counts: (f, m, b) => `空き <b class="f">${f}</b> · 要確認 <b class="m">${m}</b> · 授業中 <b>${b}</b>`,
       cardsFallback: '地図を読み込めなかったため、建物をカードで表示しています。', mapAria: (c) => `${c}の地図。色が濃い建物ほど空き教室が多いです。`,
@@ -412,7 +440,7 @@ button { cursor: pointer; }
       terms: { '10': '第1学期', '11': '夏季学期', '20': '第2学期', '21': '冬季学期' }, sem: (y, t) => `${y}年${t}`,
       loadingSchool: '正在加载学校课表', campus: '校区', global: '全球校区', medical: '医学校区',
       theme: '显示模式', themeSystem: '跟随系统设置', themeLight: '浅色模式', themeDark: '深色模式', lang: '语言',
-      filters: '筛选条件', day: '星期', time: '时间', now: '现在', roomSearch: '查看教室课表', show: '查看', semester: '学期', loading: '正在加载课表…',
+      filters: '筛选条件', day: '星期', time: '时间', now: '现在', changeTime: '更改星期和时间', byHour: '各时段空教室', barAria: (h, n) => `${h}，空教室 ${n} 间`, roomSearch: '查看教室课表', show: '查看', semester: '学期', loading: '正在加载课表…',
       weeks: (n) => `${n}周课程`, multi: '多个教室', noMore: '之后无课', free: '空闲', maybe: '需确认', busy: '上课中', nowPrefix: '现在 · ',
       counts: (f, m, b) => `空闲 <b class="f">${f}</b> 间 · 需确认 <b class="m">${m}</b> 间 · 上课中 <b>${b}</b> 间`,
       cardsFallback: '地图加载失败，以卡片形式显示建筑。', mapAria: (c) => `${c}地图。颜色越深的建筑空教室越多。`,
@@ -442,7 +470,7 @@ button { cursor: pointer; }
       terms: { '10': 'Học kỳ 1', '11': 'Học kỳ hè', '20': 'Học kỳ 2', '21': 'Học kỳ đông' }, sem: (y, t) => `${t} năm ${y}`,
       loadingSchool: 'Đang tải thời khóa biểu của trường', campus: 'Cơ sở', global: 'Cơ sở Global', medical: 'Cơ sở Y khoa',
       theme: 'Chế độ hiển thị', themeSystem: 'Theo cài đặt hệ thống', themeLight: 'Chế độ sáng', themeDark: 'Chế độ tối', lang: 'Ngôn ngữ',
-      filters: 'Điều kiện tìm', day: 'Thứ', time: 'Giờ', now: 'Bây giờ', roomSearch: 'Xem lịch phòng học', show: 'Xem', semester: 'Học kỳ', loading: 'Đang tải thời khóa biểu…',
+      filters: 'Điều kiện tìm', day: 'Thứ', time: 'Giờ', now: 'Bây giờ', changeTime: 'Đổi thứ và giờ', byHour: 'Phòng trống theo giờ', barAria: (h, n) => `${h}, ${n} phòng trống`, roomSearch: 'Xem lịch phòng học', show: 'Xem', semester: 'Học kỳ', loading: 'Đang tải thời khóa biểu…',
       weeks: (n) => `Lớp ${n} tuần`, multi: 'Nhiều phòng', noMore: 'Hết lớp', free: 'Trống', maybe: 'Cần kiểm tra', busy: 'Đang có lớp', nowPrefix: 'Bây giờ · ',
       counts: (f, m, b) => `<b class="f">${f}</b> phòng trống · <b class="m">${m}</b> cần kiểm tra · <b>${b}</b> đang có lớp`,
       cardsFallback: 'Không tải được bản đồ nên các tòa nhà được hiển thị dạng thẻ.', mapAria: (c) => `Bản đồ ${c}. Tòa nhà màu càng đậm càng nhiều phòng trống.`,
@@ -472,7 +500,7 @@ button { cursor: pointer; }
       terms: { '10': '1-р улирал', '11': 'зуны улирал', '20': '2-р улирал', '21': 'өвлийн улирал' }, sem: (y, t) => `${y} оны ${t}`,
       loadingSchool: 'Сургуулийн хуваарийг ачаалж байна', campus: 'Кампус', global: 'Глобал кампус', medical: 'Анагаахын кампус',
       theme: 'Дэлгэцийн горим', themeSystem: 'Системийн тохиргоог дагах', themeLight: 'Цайвар горим', themeDark: 'Бараан горим', lang: 'Хэл',
-      filters: 'Хайлтын нөхцөл', day: 'Гараг', time: 'Цаг', now: 'Одоо', roomSearch: 'Ангийн хуваарь харах', show: 'Харах', semester: 'Улирал', loading: 'Хуваарь ачаалж байна…',
+      filters: 'Хайлтын нөхцөл', day: 'Гараг', time: 'Цаг', now: 'Одоо', changeTime: 'Гараг, цаг өөрчлөх', byHour: 'Цаг тутмын сул анги', barAria: (h, n) => `${h}, сул анги ${n}`, roomSearch: 'Ангийн хуваарь харах', show: 'Харах', semester: 'Улирал', loading: 'Хуваарь ачаалж байна…',
       weeks: (n) => `${n} долоо хоногийн хичээл`, multi: 'Олон анги', noMore: 'Цаашид хичээлгүй', free: 'Сул', maybe: 'Шалгах', busy: 'Хичээлтэй', nowPrefix: 'Одоо · ',
       counts: (f, m, b) => `Сул <b class="f">${f}</b> · Шалгах <b class="m">${m}</b> · Хичээлтэй <b>${b}</b>`,
       cardsFallback: 'Газрын зураг ачаалагдсангүй тул барилгуудыг картаар харуулж байна.', mapAria: (c) => `${c} — газрын зураг. Өнгө нь тод барилгад сул анги олон.`,
@@ -639,6 +667,7 @@ button { cursor: pointer; }
     const ti = $('startSel');
     if (document.activeElement !== ti) ti.value = hhmm(S.ws);
     $('nowBtn').setAttribute('aria-pressed', String(S.nowMode));
+    $('whenTxt').textContent = whenText();
     $('roomList').innerHTML = campusRooms().sort((a, b) => ko(a.label, b.label)).map((r) => `<option value="${esc(r.label)}"></option>`).join('');
   }
 
@@ -648,9 +677,33 @@ button { cursor: pointer; }
     if (S.mapBld && !mapGroupExists(R, S.mapBld)) S.mapBld = '';
     if (S.room && !ROOMS.has(S.room)) S.room = null;
 
-    const when = `${S.nowMode ? T().nowPrefix : ''}${T().daysFull[S.day]} ${hhmm(S.ws)}`;
-    $('summary').innerHTML = `<span class="when">${when}</span><span class="counts">${T().counts(freeAll, maybeAll, R.res.length - freeAll - maybeAll)}</span>`;
+    $('whenTxt').textContent = whenText();
+    $('summary').innerHTML = `<span class="counts">${T().counts(freeAll, maybeAll, R.res.length - freeAll - maybeAll)}</span>`;
+    renderBars();
     renderMap(R);
+  }
+
+  /* ---------- day/time picker: collapsed "now" chip + free rooms by hour (Google Maps "popular times" style) ---------- */
+  const whenText = () => `${S.nowMode ? T().nowPrefix : ''}${T().daysFull[S.day]} ${hhmm(S.ws)}`;
+  const HOURS = Array.from({ length: LAST - FIRST }, (_, i) => FIRST + i);
+  let barMemo = null;
+  function hourCounts() {
+    if (barMemo && barMemo.rooms === ROOMS && barMemo.campus === S.campus && barMemo.day === S.day) return barMemo;
+    const rooms = campusRooms();
+    const counts = HOURS.map((h) => rooms.reduce((n, r) => n + (status(r, S.day, h, h + 1 / 60).st === 'free' ? 1 : 0), 0));
+    return (barMemo = { rooms: ROOMS, campus: S.campus, day: S.day, counts, total: rooms.length });
+  }
+  function nowHour() { const n = seoulNow(); return n.day === S.day && n.t >= FIRST && n.t < LAST ? Math.floor(n.t) : -1; }
+  function renderBars() {
+    if ($('whenPanel').hidden) return;
+    const { counts, total } = hourCounts(), nowH = nowHour(), sel = Math.floor(S.ws + 1e-9);
+    $('barsPlot').parentNode.style.setProperty('--n', HOURS.length);
+    $('barsPlot').innerHTML = HOURS.map((h, i) => {
+      const v = total ? Math.min(1, counts[i] / total) : 0;
+      const tag = h === nowH ? `<span class="tag">${esc(T().now)}</span>` : '';
+      return `<button type="button" class="bar" data-h="${h}" style="--v:${v.toFixed(3)}" aria-pressed="${h === sel}" aria-label="${esc(T().barAria(hhmm(h), counts[i]) + (h === nowH ? ' · ' + T().now : ''))}">${tag}<i></i></button>`;
+    }).join('');
+    $('barsX').innerHTML = HOURS.map((h) => `<span>${h % 3 === 0 ? h : ''}</span>`).join('');
   }
 
   /* ---------- map view ---------- */
@@ -882,6 +935,28 @@ button { cursor: pointer; }
     $('daySeg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.day = +b.dataset.d; S.nowMode = false; renderControls(); render(); };
     $('startSel').oninput = () => { const m = /^(\d{2}):(\d{2})/.exec($('startSel').value); if (!m) return; S.nowMode = false; S.ws = +m[1] + +m[2] / 60; S.we = S.ws + 1 / 60; $('nowBtn').setAttribute('aria-pressed', 'false'); render(); };
     $('nowBtn').onclick = () => { setNow(); renderControls(); render(); };
+    $('whenBtn').onclick = () => {
+      const open = $('whenPanel').hidden;
+      $('whenPanel').hidden = !open; $('whenBtn').setAttribute('aria-expanded', String(open));
+      if (open) renderBars();
+    };
+    $('barsPlot').onclick = (e) => {
+      const b = e.target.closest('[data-h]'); if (!b) return;
+      const h = +b.dataset.h;
+      if (h === nowHour()) setNow(); else { S.ws = h; S.we = h + 1 / 60; S.nowMode = false; }
+      renderControls(); render();
+    };
+    // "지금"을 보고 있으면 시계를 따라간다. 수업은 정시에 시작하므로 시간(시)이 바뀔 때만 다시 계산한다.
+    const tick = () => {
+      if (!S.nowMode || document.hidden) return;
+      const n = seoulNow();
+      if (n.day !== S.day || n.t >= LAST || Math.floor(n.t) !== Math.floor(S.ws + 1e-9)) { setNow(); renderControls(); render(); return; }
+      S.ws = n.t; S.we = n.t + 1 / 60;
+      $('whenTxt').textContent = whenText();
+      if (document.activeElement !== $('startSel')) $('startSel').value = hhmm(S.ws);
+    };
+    setInterval(tick, 30000);
+    document.addEventListener('visibilitychange', tick);
     const roomClick = (e) => { const b = e.target.closest('[data-room]'); if (b) { openRoom(b.dataset.room); return true; } return false; };
     $('mapPanel').onclick = (e) => { if (roomClick(e)) return; const b = e.target.closest('[data-mb]'); if (b) selectMapBld(b.dataset.mb); };
     $('mapMain').onclick = (e) => { const b = e.target.closest('[data-mb]'); if (b) selectMapBld(b.dataset.mb); };
