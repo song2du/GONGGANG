@@ -154,6 +154,13 @@ button { cursor: pointer; }
 .plate:hover { border-color: var(--accent); }
 .plate[aria-current="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
 .empty { padding: 24px; border: 1px dashed var(--rule); border-radius: 10px; color: var(--ink-2); text-align: center; }
+.plate.soon { border-color: var(--rule); background: var(--paper); }
+.plate.soon .no { color: var(--ink-2); }
+.plate.soon .sub { color: var(--ink-3); }
+.floors { display: flex; flex-direction: column; gap: 16px; }
+.floor { display: flex; flex-direction: column; gap: 8px; }
+.floor-h { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.floor-h::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
 
 .mapwrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
 @media (min-width: 920px) { .mapwrap { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: stretch; } .mappanel { contain: size; overflow-y: auto; overscroll-behavior: contain; } }
@@ -357,7 +364,7 @@ button { cursor: pointer; }
       freeRooms: '빈 강의실', noClasses: '수업 없음', noMapPos: '지도 위치 없음', buildings: '건물',
       hintMap: '지도에서 건물이나 숫자를 눌러도 돼요.', hintCards: '카드를 누르면 빈 강의실이 나와요.', rankNote: '초록 숫자는 빈 강의실, 노란 숫자는 확인 필요 강의실 수예요.',
       bldStats: (f, m, t) => `빈 강의실 ${f} · 확인 필요 ${m} · 전체 ${t}`, cardSub: (m, t) => `빈 강의실 · 확인 필요 ${m} · 전체 ${t}`,
-      allBuildings: '건물 목록', kakao: '카카오맵', naver: '네이버 지도', google: '구글 지도', allBusy: '이 시간에는 모든 강의실에 수업이 있어요.', profTBA: '담당교수 미정',
+      allBuildings: '건물 목록', kakao: '카카오맵', naver: '네이버 지도', google: '구글 지도', floor: (f) => f < 0 ? `B${-f}층` : `${f}층`, floorOther: '기타', endsAt: (t) => `${t} 수업 끝`, allBusy: '이 시간에는 모든 강의실에 수업이 있어요.', profTBA: '담당교수 미정',
       backTo: (b) => `← ${b} 빈 강의실`, courses: (n) => `이번 학기 수업 ${n}개`,
       lgRegular: '정규 수업', lgPart: '일부 기간 수업', lgMulti: '강의실 여러 곳', lgSel: '고른 시간',
       errEmpty: '강의실 이름을 입력하세요. 예: 가천관 612', errMany: (n) => `${n}곳이 맞아요. 건물 이름까지 입력해 보세요.`,
@@ -387,7 +394,7 @@ button { cursor: pointer; }
       freeRooms: 'Free rooms', noClasses: 'No classes', noMapPos: 'Not on map', buildings: 'Buildings',
       hintMap: 'You can also tap a building or number on the map.', hintCards: 'Tap a card to see its free rooms.', rankNote: 'Green numbers are free rooms; yellow numbers are rooms to check.',
       bldStats: (f, m, t) => `${f} free · ${m} to check · ${t} total`, cardSub: (m, t) => `free · ${m} to check · ${t} total`,
-      allBuildings: 'All buildings', kakao: 'KakaoMap', naver: 'Naver Map', google: 'Google Maps', allBusy: 'Every room has a class at this time.', profTBA: 'Instructor TBA',
+      allBuildings: 'All buildings', kakao: 'KakaoMap', naver: 'Naver Map', google: 'Google Maps', floor: (f) => f < 0 ? `Basement ${-f}` : `Floor ${f}`, floorOther: 'Other', endsAt: (t) => `Ends ${t}`, allBusy: 'Every room has a class at this time.', profTBA: 'Instructor TBA',
       backTo: (b) => `← Free rooms in ${b}`, courses: (n) => `${n} classes this semester`,
       lgRegular: 'Regular class', lgPart: 'Part-term class', lgMulti: 'Multiple rooms', lgSel: 'Selected time',
       errEmpty: 'Enter a room, e.g. 가천관 612', errMany: (n) => `${n} rooms match. Add the building name too.`,
@@ -417,7 +424,7 @@ button { cursor: pointer; }
       freeRooms: '空き教室', noClasses: '授業なし', noMapPos: '地図に位置なし', buildings: '建物',
       hintMap: '地図上の建物や数字をタップしても選べます。', hintCards: 'カードをタップすると空き教室が表示されます。', rankNote: '緑の数字は空き教室、黄色の数字は要確認の教室の数です。',
       bldStats: (f, m, t) => `空き ${f} · 要確認 ${m} · 全 ${t}`, cardSub: (m, t) => `空き教室 · 要確認 ${m} · 全 ${t}`,
-      allBuildings: '建物一覧', kakao: 'カカオマップ', naver: 'NAVER地図', google: 'Googleマップ', allBusy: 'この時間はすべての教室で授業があります。', profTBA: '担当教員未定',
+      allBuildings: '建物一覧', kakao: 'カカオマップ', naver: 'NAVER地図', google: 'Googleマップ', floor: (f) => f < 0 ? `地下${-f}階` : `${f}階`, floorOther: 'その他', endsAt: (t) => `${t} 終了`, allBusy: 'この時間はすべての教室で授業があります。', profTBA: '担当教員未定',
       backTo: (b) => `← ${b}の空き教室`, courses: (n) => `今学期の授業 ${n}件`,
       lgRegular: '通常の授業', lgPart: '一部期間の授業', lgMulti: '複数教室', lgSel: '選んだ時刻',
       errEmpty: '教室名を入力してください。例：가천관 612', errMany: (n) => `${n}件該当します。建物名も入力してください。`,
@@ -447,7 +454,7 @@ button { cursor: pointer; }
       freeRooms: '空教室', noClasses: '无课', noMapPos: '地图上无位置', buildings: '建筑',
       hintMap: '也可以点击地图上的建筑或数字。', hintCards: '点击卡片查看空教室。', rankNote: '绿色数字为空教室数，黄色数字为需确认的教室数。',
       bldStats: (f, m, t) => `空闲 ${f} · 需确认 ${m} · 共 ${t}`, cardSub: (m, t) => `空教室 · 需确认 ${m} · 共 ${t}`,
-      allBuildings: '建筑列表', kakao: 'Kakao地图', naver: 'Naver地图', google: '谷歌地图', allBusy: '此时所有教室都有课。', profTBA: '任课教师待定',
+      allBuildings: '建筑列表', kakao: 'Kakao地图', naver: 'Naver地图', google: '谷歌地图', floor: (f) => f < 0 ? `地下${-f}层` : `${f}层`, floorOther: '其他', endsAt: (t) => `${t} 下课`, allBusy: '此时所有教室都有课。', profTBA: '任课教师待定',
       backTo: (b) => `← ${b} 空教室`, courses: (n) => `本学期课程 ${n} 门`,
       lgRegular: '常规课程', lgPart: '部分周期课程', lgMulti: '多个教室', lgSel: '所选时间',
       errEmpty: '请输入教室，例如：가천관 612', errMany: (n) => `有 ${n} 间教室匹配，请同时输入建筑名称。`,
@@ -477,7 +484,7 @@ button { cursor: pointer; }
       freeRooms: 'Phòng trống', noClasses: 'Không có lớp', noMapPos: 'Không có trên bản đồ', buildings: 'Tòa nhà',
       hintMap: 'Bạn cũng có thể chạm vào tòa nhà hoặc con số trên bản đồ.', hintCards: 'Chạm vào thẻ để xem phòng trống.', rankNote: 'Số màu xanh là phòng trống, số màu vàng là phòng cần kiểm tra.',
       bldStats: (f, m, t) => `${f} trống · ${m} cần kiểm tra · tổng ${t}`, cardSub: (m, t) => `phòng trống · ${m} cần kiểm tra · tổng ${t}`,
-      allBuildings: 'Danh sách tòa nhà', kakao: 'KakaoMap', naver: 'Naver Map', google: 'Google Maps', allBusy: 'Giờ này phòng nào cũng có lớp.', profTBA: 'Chưa có giảng viên',
+      allBuildings: 'Danh sách tòa nhà', kakao: 'KakaoMap', naver: 'Naver Map', google: 'Google Maps', floor: (f) => f < 0 ? `Tầng hầm ${-f}` : `Tầng ${f}`, floorOther: 'Khác', endsAt: (t) => `Hết lớp ${t}`, allBusy: 'Giờ này phòng nào cũng có lớp.', profTBA: 'Chưa có giảng viên',
       backTo: (b) => `← Phòng trống ở ${b}`, courses: (n) => `${n} lớp trong học kỳ này`,
       lgRegular: 'Lớp thường', lgPart: 'Lớp học một phần học kỳ', lgMulti: 'Nhiều phòng', lgSel: 'Giờ đã chọn',
       errEmpty: 'Hãy nhập tên phòng, ví dụ: 가천관 612', errMany: (n) => `Có ${n} phòng khớp. Hãy nhập thêm tên tòa nhà.`,
@@ -507,7 +514,7 @@ button { cursor: pointer; }
       freeRooms: 'Сул анги', noClasses: 'Хичээлгүй', noMapPos: 'Газрын зурагт байхгүй', buildings: 'Барилга',
       hintMap: 'Газрын зураг дээрх барилга эсвэл тоог дарж болно.', hintCards: 'Картыг дарвал сул ангиуд гарна.', rankNote: 'Ногоон тоо нь сул анги, шар тоо нь шалгах шаардлагатай ангийн тоо.',
       bldStats: (f, m, t) => `Сул ${f} · Шалгах ${m} · Нийт ${t}`, cardSub: (m, t) => `сул анги · Шалгах ${m} · Нийт ${t}`,
-      allBuildings: 'Барилгын жагсаалт', kakao: 'KakaoMap', naver: 'Naver Map', google: 'Google Maps', allBusy: 'Энэ цагт бүх ангид хичээл орж байна.', profTBA: 'Багш тодорхойгүй',
+      allBuildings: 'Барилгын жагсаалт', kakao: 'KakaoMap', naver: 'Naver Map', google: 'Google Maps', floor: (f) => f < 0 ? `B${-f} давхар` : `${f}-р давхар`, floorOther: 'Бусад', endsAt: (t) => `${t}-д дуусна`, allBusy: 'Энэ цагт бүх ангид хичээл орж байна.', profTBA: 'Багш тодорхойгүй',
       backTo: (b) => `← ${b}: сул анги`, courses: (n) => `Энэ улиралд ${n} хичээл`,
       lgRegular: 'Тогтмол хичээл', lgPart: 'Улирлын хэсэгт ордог хичээл', lgMulti: 'Олон анги', lgSel: 'Сонгосон цаг',
       errEmpty: 'Ангийн нэрээ оруулна уу. Жишээ: 가천관 612', errMany: (n) => `${n} анги таарч байна. Барилгын нэрийг нэмж оруулна уу.`,
@@ -638,7 +645,11 @@ button { cursor: pointer; }
     for (const b of room.blocks) if (b.d === d && b.s < we && ws < b.e) (b.sure ? sure : unsure).push(b);
     let next = null;
     for (const b of room.blocks) if (b.d === d && b.sure && b.s >= we && (next === null || b.s < next)) next = b.s;
-    if (sure.length) return { st: 'busy', blocks: sure, next };
+    if (sure.length) {
+      let freeAt = Math.max(...sure.map((b) => b.e));
+      for (let grew = true; grew;) { grew = false; for (const b of room.blocks) if (b.d === d && b.sure && b.s <= freeAt && b.e > freeAt) { freeAt = b.e; grew = true; } }
+      return { st: 'busy', blocks: sure, next, freeAt };
+    }
     return { st: unsure.length ? 'maybe' : 'free', blocks: unsure, next };
   }
   const reason = (blocks) => blocks[0].c.partial ? T().weeks(blocks[0].c.partial) : T().multi;
@@ -653,12 +664,31 @@ button { cursor: pointer; }
     return { res, groups, stats, names: [...groups.keys()].sort(ko) };
   }
 
-  function platesHTML(list) {
-    return list.filter((x) => x.st !== 'busy').sort((a, b) => byNo(a.r, b.r)).map((x) => {
-      const sub = x.st === 'free' ? (x.next !== null ? `~${hhmm(x.next)}` : T().noMore) : reason(x.blocks);
-      const cur = S.room === x.r.key ? ' aria-current="true"' : '';
-      return `<button type="button" class="plate ${x.st}" data-room="${esc(x.r.key)}"${cur} aria-label="${esc(x.r.label)}, ${x.st === 'free' ? T().free : T().maybe}, ${esc(sub)}"><span class="no">${esc(x.r.no || x.r.bld)}</span><span class="sub">${esc(sub)}</span></button>`;
-    }).join('');
+  // 수업은 정시에 끝나므로, 한 시간 안에 수업이 끝나는 강의실(= 지금 교시가 마지막인 강의실)을 '곧 빔'으로 함께 보여준다.
+  const SOON = 1;
+  const isSoon = (x) => x.st === 'busy' && x.freeAt - S.ws <= SOON + 1e-9 && x.freeAt < LAST;
+  // 호수에서 층을 읽는다: 612 → 6층, B203 → B2층, 5_25 → 5층
+  function floorOf(no) {
+    let m = /^B(\d)/i.exec(no); if (m) return -m[1];
+    m = /^(\d+)\d\d/.exec(no) || /^(\d+)_/.exec(no);
+    return m ? +m[1] : null;
+  }
+  function plateHTML(x) {
+    const cur = S.room === x.r.key ? ' aria-current="true"' : '';
+    const sub = x.st === 'busy' ? T().endsAt(hhmm(x.freeAt)) : x.st === 'free' ? (x.next !== null ? `~${hhmm(x.next)}` : T().noMore) : reason(x.blocks);
+    const cls = x.st === 'busy' ? 'soon' : x.st;
+    const stTxt = x.st === 'busy' ? T().busy : x.st === 'free' ? T().free : T().maybe;
+    return `<button type="button" class="plate ${cls}" data-room="${esc(x.r.key)}"${cur} aria-label="${esc(x.r.label)}, ${stTxt}, ${esc(sub)}"><span class="no">${esc(x.r.no || x.r.bld)}</span><span class="sub">${esc(sub)}</span></button>`;
+  }
+  function floorsHTML(list) {
+    const by = new Map();
+    for (const x of list.filter((x) => x.st !== 'busy' || isSoon(x)).sort((a, b) => byNo(a.r, b.r))) {
+      const f = floorOf(x.r.no);
+      if (!by.has(f)) by.set(f, []);
+      by.get(f).push(x);
+    }
+    const keys = [...by.keys()].sort((a, b) => (a === null) - (b === null) || a - b);
+    return keys.map((f) => `<section class="floor"><h3 class="floor-h">${esc(f === null ? T().floorOther : T().floor(f))}</h3><div class="plates">${by.get(f).map(plateHTML).join('')}</div></section>`).join('');
   }
 
   function renderControls() {
@@ -836,10 +866,11 @@ button { cursor: pointer; }
     const links = geo
       ? `<a href="https://map.kakao.com/link/map/${encodeURIComponent(q)},${geo.lat},${geo.lon}">${T().kakao}</a><a href="https://map.naver.com/p/search/${encodeURIComponent(q)}">${T().naver}</a><a href="https://www.google.com/maps/search/?api=1&query=${geo.lat},${geo.lon}">${T().google}</a>`
       : `<a href="https://map.kakao.com/?q=${encodeURIComponent(q)}">${T().kakao}</a><a href="https://map.naver.com/p/search/${encodeURIComponent(q)}">${T().naver}</a><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}">${T().google}</a>`;
-    const plates = platesHTML(e.list);
+    const floors = floorsHTML(e.list), anyFree = e.free + e.maybe > 0;
     el.innerHTML = `<div class="mp-h"><div><h2>${esc(displayName(e))}${trSpan(displayName(e))}</h2><p>${T().bldStats(e.free, e.maybe, e.total)}</p></div><button type="button" class="ghost" id="panelBack">${T().allBuildings}</button></div>
       <div class="links">${links}</div>
-      ${plates ? `<div class="plates">${plates}</div>` : `<div class="empty">${T().allBusy}</div>`}`;
+      ${anyFree ? '' : `<div class="empty">${T().allBusy}</div>`}
+      ${floors ? `<div class="floors">${floors}</div>` : ''}`;
     $('panelBack').onclick = () => { S.mapBld = ''; render(); };
   }
 
